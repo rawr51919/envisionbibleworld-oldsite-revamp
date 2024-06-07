@@ -1,5 +1,5 @@
-<?php namespace App\Http\Controllers;
-
+<?php
+namespace App\Http\Controllers;
 use App\Category;
 use App\Era;
 use App\Source;
@@ -40,13 +40,13 @@ class PublicController extends Controller {
      */
     public function index()
     {
-        return view('http://envisionbibleworld.com');
+        return view('public');
     }
-		
-		public function aboutdatabase()
-		{
-			return view('public.aboutdatabase');
-		}
+        
+        public function aboutdatabase()
+        {
+            return view('public.aboutdatabase');
+        }
 
     public function background()
     {
@@ -97,9 +97,9 @@ class PublicController extends Controller {
 
     public function lifestylesofjesustime()
     {
-        return view('http://envisionbibleworld.com/lifestyles-jesus-time/');
+        return view('public.lifestyles-jesus-time');
     }
-		
+        
     public function oldandnew()
     {
         return view('public.oldandnewtestamenttimes');
@@ -116,7 +116,7 @@ class PublicController extends Controller {
 //        $subQuery = Source::select(DB::raw('DISTINCT ON ("SourceName") "SourceName", "SourceId"'));
         $subQuery = Source::select(DB::raw('DISTINCT SourceName, SourceId'));
 
-        $query = Source::select()->from(\DB::raw(' ( ' . $subQuery->toSql() . ' ) AS sources '))
+        $query = Source::select()->from(DB::raw(' ( ' . $subQuery->toSql() . ' ) AS sources '))
             ->orderBy('SourceId')
             ->get();
 
@@ -153,7 +153,7 @@ class PublicController extends Controller {
                 'tblSource.SourceName', 'tblSource_Type.Source_Type', 'tblSource_Type.Source_Type_Abbreviation', 'tblSource_Quoted.BeginChptrSectionMinute', 'tblSource_Quoted.BeginVersePageSecond',
                 'tblSource_Quoted.EndChptrSectionMinute', 'tblSource_Quoted.EndVersePageSecond', 'tblSource_Quoted.Source_Explanation',
                 'tblQuotation.Quotation', 'tblStatusType.StatusType')
-						->where('tblSummary_Details.StatusTypeId', '=', '2')
+                        ->where('tblSummary_Details.StatusTypeId', '=', '2')
             ->get();
         return Datatables::of($data)->make(true);
     }

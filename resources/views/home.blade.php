@@ -15,7 +15,7 @@
     <div class="tab-content clearfix">
         <div class="tab-pane active" id="double">
             <h3>Choose View</h3>
-            <form class="form-horizontal" role="form" method="POST" action="{{ url('/home/show') }}">
+            <form class="form-horizontal" method="POST" action="{{ url('/home/show') }}">
                 <input type="hidden" name="_token" value="{{ csrf_token() }}">
                 <div class="form-group">
                     <label class="control-label col-sm-2" for="email">Start at:</label>
@@ -27,7 +27,7 @@
                     </div>
                 </div>
                 <div class="form-group">
-                    <label class="control-label col-sm-2"></label>
+                    <label class="control-label col-sm-2" for="startTwo">Sources</label>
                     <div class="col-sm-10">
                         {{--Later, option data comes from tblSourceField table --}}
                         <select class="form-control" id="startTwo" name="secondStart">

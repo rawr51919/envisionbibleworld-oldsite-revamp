@@ -1,4 +1,5 @@
-<?php namespace App;
+<?php
+namespace App;
 
 use Illuminate\Database\Eloquent\Model;
 
@@ -20,7 +21,7 @@ class Era extends Model {
      * @var array
      */
     protected $fillable = [
-        'Era', 
+        'Era',
         'Era_Explanation'
     ];
 

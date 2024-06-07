@@ -1,4 +1,5 @@
-<?php namespace App;
+<?php
+namespace App;
 
 use Illuminate\Database\Eloquent\Model;
 
@@ -32,13 +33,13 @@ class SourceDetail extends Model {
         return $this->belongsTo('App\SourceType', 'SourceTypeId');
     }
 
-//    public function publisher()
-//    {
-//        return $this->belongsTo('App\Publisher', 'PublisherId');
-//    }
+   public function publisher()
+   {
+       return $this->belongsTo('App\Publisher', 'PublisherId');
+   }
 
-//    public function statusType()
-//    {
-//        return $this->belongsTo('App\StatusType', 'StatusTypeId');
-//    }
+   public function statusType()
+   {
+       return $this->belongsTo('App\StatusType', 'StatusTypeId');
+   }
 }

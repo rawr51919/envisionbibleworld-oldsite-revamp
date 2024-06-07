@@ -1,4 +1,5 @@
-<?php namespace App\Http\Controllers;
+<?php
+namespace App\Http\Controllers;
 
 use App\Http\Requests;
 use App\Http\Controllers\Controller;
@@ -30,24 +31,27 @@ class SourceTypeController extends Controller {
         $sord = $_GET['sord'];
 
         $count = SourceType::all()->count();
-        if( $count > 0 && $limit > 0) {
+        if ($count > 0 && $limit > 0) {
             $total_pages = ceil($count/$limit);
         } else {
             $total_pages = 0;
         }
 
-        if ($page > $total_pages)
+        if ($page > $total_pages) {
             $page = $total_pages;
+        }
 
 
         $start = $limit * $page - $limit;
-        if($start < 0) $start = 0;
+        if ($start < 0) {
+            $start = 0;
+        }
 
         $sourceTypes = SourceType::skip($start)->take($limit)
             ->orderBy($sidx, $sord)
             ->get();
 
-        $res = Array('page'=>$page,'total'=>$total_pages, 'records'=>$count, 'rows'=>$sourceTypes);
+        $res = array('page'=>$page,'total'=>$total_pages, 'records'=>$count, 'rows'=>$sourceTypes);
         return response()->json($res);
     }
 
@@ -71,9 +75,9 @@ class SourceTypeController extends Controller {
             }
 
         } catch (\Exception $e) {
-            return response()->json(Array('result'=>false, 'msg'=>'Save failed!!'));
+            return response()->json(array('result'=>false, 'msg'=>'Save failed!!'));
         }
-        return response()->json(Array('result'=>true, 'msg'=>'Successfully Saved!!'));
+        return response()->json(array('result'=>true, 'msg'=>'Successfully saved!!'));
     }
 
     public function postDeleteSourceType(Request $request) {
@@ -85,10 +89,10 @@ class SourceTypeController extends Controller {
             $obj->delete();
 
         } catch (\Exception $e) {
-            return response()->json(Array('result'=>false, 'msg'=>'Deleted failed!!'));
+            return response()->json(array('result'=>false, 'msg'=>'Deleted failed!!'));
         }
 
-        return response()->json(Array('result'=>true, 'msg'=>'Successfully Deleted!!'));
+        return response()->json(array('result'=>true, 'msg'=>'Successfully Deleted!!'));
     }
 
 }

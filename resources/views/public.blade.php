@@ -71,25 +71,25 @@
                 <span class="icon-bar"></span>
                 <span class="icon-bar"></span>
             </button>
-            <span class="navbar-logo"><a class="navbar-brand" href="/public"><img src="/img/logo2_edited.png"></a></span>
+            <span class="navbar-logo"><a class="navbar-brand" href="/public"><img src="/img/logo2_edited.png" alt="Envision Bible World"></a></span>
             {{--<a class="navbar-brand" href="/public">Home</a>--}}
         </div>
 
         <div class="collapse navbar-collapse">
             <ul class="nav navbar-nav">
                 <li class="dropdown">
-									<a href="#" class="dropdown-toggle" data-toggle="dropdown">Envision Bible World <b class="caret"></b></a>
-									<ul class="dropdown-menu">
-		                <li><a href="http://envisionbibleworld.com/">Envision Bible World</a></li>
+                                    <a href="#" class="dropdown-toggle" data-toggle="dropdown">Envision Bible World <b class="caret"></b></a>
+                                    <ul class="dropdown-menu">
+                        <li><a href="http://envisionbibleworld.com/">Envision Bible World</a></li>
                         <li class="divider"></li>
-		                <li><a href="http://envisionbibleworld.com/lifestyles-jesus-time/">Pictures: Life Styles of Jesus' Time</a></li>
+                        <li><a href="http://envisionbibleworld.com/lifestyles-jesus-time/">Pictures: Life Styles of Jesus' Time</a></li>
                         <li class="divider"></li>
                     <li><a href="http://envisionbibleworld.com/old-new-testament-times/">Pictures: Old and New Testament Times</a></li>
                         <li class="divider"></li>
                     <li><a href="http://envisionbibleworld.com/stories-about-jesus/">Pictures: Stories About Jesus</a></li>
-									</ul>
-								</li>
-								<li class="dropdown">
+                                    </ul>
+                                </li>
+                                <li class="dropdown">
                     <a href="#" class="dropdown-toggle" data-toggle="dropdown">About Me <b class="caret"></b></a>
                     <ul class="dropdown-menu">
                         <li><a href="http://envisionbibleworld.com/about-me/">About Me</a></li>
@@ -125,7 +125,7 @@
                     <a href="#" class="dropdown-toggle" data-toggle="dropdown">Blog <b class="caret"></b></a>
                     <ul class="dropdown-menu">
                         <li><a href="http://envisionbibleworld.com/blog/">Blog</a></li>
-												<li class="divider"></li>
+                                                <li class="divider"></li>
                         <li><a href="http://envisionbibleworld.com/contact-us/">Contact Us</a></li>
                     </ul>
                 </li>

@@ -1,8 +1,11 @@
-<?php namespace App;
+<?php
+
+namespace App;
 
 use Illuminate\Database\Eloquent\Model;
 
-class Source extends Model {
+class Source extends Model
+{
 
     protected $table = 'tblSource';
 
@@ -10,7 +13,7 @@ class Source extends Model {
 
     public $timestamps = false;
 
-    
+
     /**
      * The attributes that are mass assignable.
      *
@@ -34,13 +37,13 @@ class Source extends Model {
         return $this->belongsTo('App\SourceType', 'SourceTypeId');
     }
 
-//    public function publisher()
-//    {
-//        return $this->belongsTo('App\Publisher', 'PublisherId');
-//    }
+    public function publisher()
+    {
+        return $this->belongsTo('App\Publisher', 'PublisherId');
+    }
 
-//    public function statusType()
-//    {
-//        return $this->belongsTo('App\StatusType', 'StatusTypeId');
-//    }
+    public function statusType()
+    {
+        return $this->belongsTo('App\StatusType', 'StatusTypeId');
+    }
 }

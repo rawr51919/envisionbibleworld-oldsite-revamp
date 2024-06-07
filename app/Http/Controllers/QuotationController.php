@@ -1,4 +1,5 @@
-<?php namespace App\Http\Controllers;
+<?php
+namespace App\Http\Controllers;
 
 use App\Http\Requests;
 use App\Http\Controllers\Controller;
@@ -13,15 +14,15 @@ class QuotationController extends Controller {
     {
         $this->middleware('auth');
     }
-	/**
-	 * Display a listing of the resource.
-	 *
-	 * @return Response
-	 */
-	public function index()
-	{
-		return view('quotation.index');
-	}
+    /**
+     * Display a listing of the resource.
+     *
+     * @return Response
+     */
+    public function index()
+    {
+        return view('quotation.index');
+    }
 
     public function getQuotation(Request $request){
         $page = $_GET['page'];
@@ -36,19 +37,22 @@ class QuotationController extends Controller {
             $total_pages = 0;
         }
 
-        if ($page > $total_pages)
+        if ($page > $total_pages) {
             $page = $total_pages;
+        }
 
 
         $start = $limit * $page - $limit;
-        if($start < 0) $start = 0;
+        if ($start < 0) {
+            $start = 0;
+        }
 
         $quotation = Quotation::leftJoin('tblStatusType', 'tblQuotation.StatusTypeId', '=', 'tblStatusType.StatusTypeId')
             ->select('tblQuotation.QuotationId', 'tblQuotation.Quotation', 'tblQuotation.StatusTypeId', 'tblStatusType.StatusType', 'tblQuotation.EntryDate')
             ->skip($start)->take($limit)
             ->orderBy($sidx, $sord)
             ->get();
-        $res = Array('page'=>$page,'total'=>$total_pages, 'records'=>$count, 'rows'=>$quotation);
+        $res = array('page'=>$page,'total'=>$total_pages, 'records'=>$count, 'rows'=>$quotation);
         return response()->json($res);
     }
 
@@ -59,21 +63,21 @@ class QuotationController extends Controller {
         //Get Quotation stuff
         try{
             if(is_numeric($id)) {
-                $Quotation = Quotation::find($id);
-                $Quotation->Quotation = $request->Quotation;
-                $Quotation->StatusTypeId = $request->StatusType;
-                $Quotation->save();
+                $quotation = Quotation::find($id);
+                $quotation->Quotation = $request->Quotation;
+                $quotation->StatusTypeId = $request->StatusType;
+                $quotation->save();
             }else {
-                $Quotation = new Quotation;
-                $Quotation->Quotation = $request->Quotation;
-                $Quotation->StatusTypeId = $request->StatusType;
-                $Quotation->save();
+                $quotation = new Quotation;
+                $quotation->Quotation = $request->Quotation;
+                $quotation->StatusTypeId = $request->StatusType;
+                $quotation->save();
             }
 
         } catch (\Exception $e) {
-            return response()->json(Array('result'=>false, 'msg'=>'Add new quotation failed!!'));
+            return response()->json(array('result'=>false, 'msg'=>'Add new quotation failed!!'));
         }
-        return response()->json(Array('result'=>false, 'msg'=>'Successfully save new quotation!!'));
+        return response()->json(array('result'=>false, 'msg'=>'Successfully save new quotation!!'));
     }
 
     /***
@@ -84,14 +88,14 @@ class QuotationController extends Controller {
         // Get quotationid and editables
         $id = $request->QuotationId;
         //Get Quotation stuff
-        $Quotation = Quotation::find($id);
+        $quotation = Quotation::find($id);
         try{
-            $Quotation->StatusTypeId = 4;
-            $Quotation->save();
+            $quotation->StatusTypeId = 4;
+            $quotation->save();
         } catch (\Exception $e) {
-            return response()->json(Array('result'=>false, 'msg'=>'Deleted failed!!'));
+            return response()->json(array('result'=>false, 'msg'=>'Delete failed!!'));
         }
-        return response()->json(Array('result'=>true, 'msg'=>'Successfully Deleted!!'));
+        return response()->json(array('result'=>true, 'msg'=>'Successfully Deleted!!'));
     }
 
 

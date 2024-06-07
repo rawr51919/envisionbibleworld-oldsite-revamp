@@ -1,4 +1,5 @@
-<?php namespace App\Http\Controllers;
+<?php
+namespace App\Http\Controllers;
 
 use App\Http\Requests;
 use App\Http\Controllers\Controller;
@@ -13,169 +14,174 @@ class SubCategoryController extends Controller {
     {
         $this->middleware('auth');
     }
-	/**
-	 * Display a listing of the resource.
-	 *
-	 * @return Response
-	 */
-	public function index()
-	{
-		$categories = Category::all();
+    /**
+     * Display a listing of the resource.
+     *
+     * @return Response
+     */
+    public function index()
+    {
+        $categories = Category::all();
 
-		return view('subcategory.index', compact('categories'));
-	}
+        return view('subcategory.index', compact('categories'));
+    }
 
-	public function getSubcategories(Request $request) {
-		$id = $request->CategoryId;
-
-
-		$page = $_GET['page'];
-		$limit = $_GET['rows'];
-		$sidx = $_GET['sidx'];
-		$sord = $_GET['sord'];
-
-		$fields = explode(', ', $sidx.''.$sord);
-
-		$count = SubCategory::where('CategoryId', '=', $id)->count();
-		if( $count > 0 && $limit > 0) {
-			$total_pages = ceil($count/$limit);
-		} else {
-			$total_pages = 0;
-		}
-
-		if ($page > $total_pages)
-			$page = $total_pages;
+    public function getSubcategories(Request $request) {
+        $id = $request->CategoryId;
 
 
-		$start = $limit * $page - $limit;
-		if($start < 0) $start = 0;
+        $page = $_GET['page'];
+        $limit = $_GET['rows'];
+        $sidx = $_GET['sidx'];
+        $sord = $_GET['sord'];
 
-		$subcategories = SubCategory::orderBy('SubcategoryId')->where('CategoryId', '=', $id)
-			->skip($start)
-			->take($limit)
-			->orderBy($sidx, $sord)
-			->get();
+        $fields = explode(', ', $sidx.''.$sord);
 
-		//return json_encode($subcategories);
+        $count = SubCategory::where('CategoryId', '=', $id)->count();
+        if( $count > 0 && $limit > 0) {
+            $total_pages = ceil($count/$limit);
+        } else {
+            $total_pages = 0;
+        }
 
-		$res = Array('page'=>$page,'total'=>$total_pages, 'records'=>$count, 'rows'=>$subcategories);
-		return response()->json($res);
-	}
+        if ($page > $total_pages) {
+            $page = $total_pages;
+        }
 
-	public function postDeleteSubcategory(Request $request) {
-		//Get Category ID and changing data
-		$id = $request->CategoryId;
 
-		try{
+        $start = $limit * $page - $limit;
+        if ($start < 0) {
+            $start = 0;
+        }
 
-			DB::beginTransaction();
+        $subcategories = SubCategory::orderBy('SubcategoryId')->where('CategoryId', '=', $id)
+            ->skip($start)
+            ->take($limit)
+            ->orderBy($sidx, $sord)
+            ->get();
 
-			$subcategory = SubCategory::find($id);
-			$subcategory->delete();
+        $res = array('page'=>$page,'total'=>$total_pages, 'records'=>$count, 'rows'=>$subcategories);
+        return response()->json($res);
+    }
 
-		} catch (\Exception $e) {
-			DB::rollback();
-			return response()->json(Array('result'=>false, 'msg'=>'Deleted failed!!'));
-		}
-		DB::commit();
+    public function postDeleteSubcategory(Request $request) {
+        //Get Category ID and changing data
+        $id = $request->CategoryId;
 
-		return response()->json(Array('result'=>true, 'msg'=>'Successfully Deleted!!'));
-	}
+        try{
 
-	public function postUpdateSubcategory(Request $request) {
-		//Get Category ID and changing data
-		$id = $request->SubcategoryId;
+            DB::beginTransaction();
 
-		//Get Summary_Details data to get summaryId and quotationId
+            $subcategory = SubCategory::find($id);
+            $subcategory->delete();
 
-		try{
-			if(is_numeric($id)) {
-				$subcategory = SubCategory::find($id);
-				$subcategory->Subcategory = $request->Subcategory;
-				$subcategory->CategoryId = $request->CategoryId;
-				$subcategory->Subcategory_Explanation = $request->Subcategory_Explanation;
-				$subcategory->StatusTypeId = $request->StatusTypeId;
-				$subcategory->save();
-			}else{
-				$newSubCategory = new SubCategory();
-				$newSubCategory->Subcategory = $request->Subcategory;
-				$newSubCategory->CategoryId = $request->CategoryId;
-				$newSubCategory->Subcategory_Explanation = $request->Subcategory_Explanation;
-				$newSubCategory->StatusTypeId = $request->StatusTypeId;
-				$newSubCategory->save();
-			}
+        } catch (\Exception $e) {
+            DB::rollback();
+            return response()->json(array('result'=>false, 'msg'=>'Deleted failed!!'));
+        }
+        DB::commit();
 
-		} catch (\Exception $e) {
+        return response()->json(array('result'=>true, 'msg'=>'Successfully Deleted!!'));
+    }
 
-		}
-	}
+    public function postUpdateSubcategory(Request $request) {
+        //Get Category ID and changing data
+        $id = $request->SubcategoryId;
 
-	/**
-	 * Show the form for creating a new resource.
-	 *
-	 * @return Response
-	 */
-	public function create()
-	{
-		//
-	}
+        //Get Summary_Details data to get summaryId and quotationId
 
-	/**
-	 * Store a newly created resource in storage.
-	 *
-	 * @return Response
-	 */
-	public function store()
-	{
-		//
-	}
+        try{
+            if(is_numeric($id)) {
+                $subcategory = SubCategory::find($id);
+                $subcategory->Subcategory = $request->Subcategory;
+                $subcategory->CategoryId = $request->CategoryId;
+                $subcategory->Subcategory_Explanation = $request->Subcategory_Explanation;
+                $subcategory->StatusTypeId = $request->StatusTypeId;
+                $subcategory->save();
+            }else{
+                $newSubCategory = new SubCategory();
+                $newSubCategory->Subcategory = $request->Subcategory;
+                $newSubCategory->CategoryId = $request->CategoryId;
+                $newSubCategory->Subcategory_Explanation = $request->Subcategory_Explanation;
+                $newSubCategory->StatusTypeId = $request->StatusTypeId;
+                $newSubCategory->save();
+            }
 
-	/**
-	 * Display the specified resource.
-	 *
-	 * @param  int  $id
-	 * @return Response
-	 */
-	public function show($id)
-	{
-		$category = Category::find($id);
+        } catch (\Exception $e) {
+            DB::rollback();
+            return response()->json(array('result'=>false, 'msg'=>'Update failed!!'));
+        }
+        DB::commit();
 
-		$categoryid = $category->CategoryId;
+        return response()->json(array('result'=>true, 'msg'=>'Successfully Updated!!'));
+    }
 
-		return view('subcategory.show', compact('category'));
-	}
+    /**
+     * Show the form for creating a new resource.
+     *
+     * @return Response
+     */
+    public function create()
+    {
+        //
+    }
 
-	/**
-	 * Show the form for editing the specified resource.
-	 *
-	 * @param  int  $id
-	 * @return Response
-	 */
-	public function edit($id)
-	{
-		//
-	}
+    /**
+     * Store a newly created resource in storage.
+     *
+     * @return Response
+     */
+    public function store()
+    {
+        //
+    }
 
-	/**
-	 * Update the specified resource in storage.
-	 *
-	 * @param  int  $id
-	 * @return Response
-	 */
-	public function update($id)
-	{
-		//
-	}
+    /**
+     * Display the specified resource.
+     *
+     * @param  int  $id
+     * @return Response
+     */
+    public function show($id)
+    {
+        $category = Category::find($id);
 
-	/**
-	 * Remove the specified resource from storage.
-	 *
-	 * @param  int  $id
-	 * @return Response
-	 */
-	public function destroy($id)
-	{
-		//
-	}
+        $categoryid = $category->CategoryId;
+
+        return view('subcategory.show', compact('category'));
+    }
+
+    /**
+     * Show the form for editing the specified resource.
+     *
+     * @param  int  $id
+     * @return Response
+     */
+    public function edit($id)
+    {
+        //
+    }
+
+    /**
+     * Update the specified resource in storage.
+     *
+     * @param  int  $id
+     * @return Response
+     */
+    public function update($id)
+    {
+        //
+    }
+
+    /**
+     * Remove the specified resource from storage.
+     *
+     * @param  int  $id
+     * @return Response
+     */
+    public function destroy($id)
+    {
+        //
+    }
 
 }

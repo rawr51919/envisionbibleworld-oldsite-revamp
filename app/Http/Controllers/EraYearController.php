@@ -1,4 +1,5 @@
-<?php namespace App\Http\Controllers;
+<?php
+namespace App\Http\Controllers;
 
 use App\EraYear;
 use App\Http\Requests;
@@ -13,15 +14,15 @@ class EraYearController extends Controller {
     {
         $this->middleware('auth');
     }
-	/**
-	 * Display a listing of the resource.
-	 *
-	 * @return Response
-	 */
-	public function index()
-	{
+    /**
+     * Display a listing of the resource.
+     *
+     * @return Response
+     */
+    public function index()
+    {
         return view('erayear.index');
-	}
+    }
 
     public function getEraYears() {
         $page = $_GET['page'];
@@ -36,12 +37,14 @@ class EraYearController extends Controller {
             $total_pages = 0;
         }
 
-        if ($page > $total_pages)
+        if ($page > $total_pages) {
             $page = $total_pages;
-
+        }
 
         $start = $limit * $page - $limit;
-        if($start < 0) $start = 0;
+        if($start < 0) {
+            $start = 0;
+        }
 
         $eras = EraYear::select(
             //Under code is for PostgreSQL
@@ -54,7 +57,7 @@ class EraYearController extends Controller {
         ->orderBy($sidx, $sord)
         ->get();
 
-        $res = Array('page'=>$page,'total'=>$total_pages, 'records'=>$count, 'rows'=>$eras);
+        $res = array('page'=>$page,'total'=>$total_pages, 'records'=>$count, 'rows'=>$eras);
         return response()->json($res);
     }
 
@@ -98,11 +101,11 @@ class EraYearController extends Controller {
 
         } catch (\Exception $e) {
             DB::rollback();
-            return response()->json(Array('result'=>false, 'msg'=>'Deleted failed!!'));
+            return response()->json(array('result'=>false, 'msg'=>'Deleted failed!!'));
         }
         DB::commit();
 
-        return response()->json(Array('result'=>true, 'msg'=>'Successfully Deleted!!'));
+        return response()->json(array('result'=>true, 'msg'=>'Successfully Deleted!!'));
     }
 
 }
