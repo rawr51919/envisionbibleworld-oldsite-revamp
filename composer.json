@@ -9,7 +9,7 @@
         "illuminate/html": "v5.0.0",
 		"illuminate/support": "v5.0.0",
         "doctrine/dbal": "^2.13.9",
-		"yajra/laravel-datatables-oracle": "v6.29.3",
+		"yajra/laravel-datatables-oracle": "v11.1.1",
         "mgallegos/laravel-jqgrid": "v1.3.0",
         "anhskohbo/no-captcha": "2.4.0"
 	},
