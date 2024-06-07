@@ -7,7 +7,7 @@
 	"require": {
 		"laravel/framework": "v5.0.0",
         "illuminate/html": "v5.0.0",
-		"illuminate/support": "v5.0.0",
+		"illuminate/support": "v11.10.0",
         "doctrine/dbal": "^2.13.9",
 		"yajra/laravel-datatables-oracle": "v6.29.3",
         "mgallegos/laravel-jqgrid": "v1.3.0",
