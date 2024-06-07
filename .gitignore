@@ -1,2 +1,3 @@
-/vendor
+# temporary exclusion for now, some files need changed in the vendor directory to get the project to run as of yet, don't touch these!
+#/vendor
 /node_modules
