@@ -1,17 +1,18 @@
 <?php
 
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
 class CreateTblUserFeedback extends Migration {
 
-	/**
-	 * Run the migrations.
-	 *
-	 * @return void
-	 */
-	public function up()
-	{
+    /**
+     * Run the migrations.
+     *
+     * @return void
+     */
+    public function up()
+    {
         Schema::create('tblUserFeedback', function(Blueprint $table) {
             $table->increments('UserFeedbackId');
             $table->string('UserName');
@@ -21,16 +22,16 @@ class CreateTblUserFeedback extends Migration {
             $table->string('Summarized')->nullable();
             $table->integer('UserReceivesResponseId')->nullable();
         });
-	}
+    }
 
-	/**
-	 * Reverse the migrations.
-	 *
-	 * @return void
-	 */
-	public function down()
-	{
-		//
-	}
+    /**
+     * Reverse the migrations.
+     *
+     * @return void
+     */
+    public function down()
+    {
+        //
+    }
 
 }

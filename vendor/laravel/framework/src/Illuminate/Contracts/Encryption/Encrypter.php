@@ -1,37 +1,49 @@
-<?php namespace Illuminate\Contracts\Encryption;
+<?php
 
-interface Encrypter {
+namespace Illuminate\Contracts\Encryption;
 
-	/**
-	 * Encrypt the given value.
-	 *
-	 * @param  string  $value
-	 * @return string
-	 */
-	public function encrypt($value);
+interface Encrypter
+{
+    /**
+     * Encrypt the given value.
+     *
+     * @param  mixed  $value
+     * @param  bool  $serialize
+     * @return string
+     *
+     * @throws \Illuminate\Contracts\Encryption\EncryptException
+     */
+    public function encrypt($value, $serialize = true);
 
-	/**
-	 * Decrypt the given value.
-	 *
-	 * @param  string  $payload
-	 * @return string
-	 */
-	public function decrypt($payload);
+    /**
+     * Decrypt the given value.
+     *
+     * @param  string  $payload
+     * @param  bool  $unserialize
+     * @return mixed
+     *
+     * @throws \Illuminate\Contracts\Encryption\DecryptException
+     */
+    public function decrypt($payload, $unserialize = true);
 
-	/**
-	 * Set the encryption mode.
-	 *
-	 * @param  string  $mode
-	 * @return void
-	 */
-	public function setMode($mode);
+    /**
+     * Get the encryption key that the encrypter is currently using.
+     *
+     * @return string
+     */
+    public function getKey();
 
-	/**
-	 * Set the encryption cipher.
-	 *
-	 * @param  string  $cipher
-	 * @return void
-	 */
-	public function setCipher($cipher);
+    /**
+     * Get the current encryption key and all previous encryption keys.
+     *
+     * @return array
+     */
+    public function getAllKeys();
 
+    /**
+     * Get the previous encryption keys.
+     *
+     * @return array
+     */
+    public function getPreviousKeys();
 }

@@ -1,12 +1,17 @@
-<?php namespace Illuminate\Contracts\Support;
+<?php
 
-interface Arrayable {
+namespace Illuminate\Contracts\Support;
 
-	/**
-	 * Get the instance as an array.
-	 *
-	 * @return array
-	 */
-	public function toArray();
-
+/**
+ * @template TKey of array-key
+ * @template TValue
+ */
+interface Arrayable
+{
+    /**
+     * Get the instance as an array.
+     *
+     * @return array<TKey, TValue>
+     */
+    public function toArray();
 }

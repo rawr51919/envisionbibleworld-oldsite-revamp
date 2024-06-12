@@ -3,11 +3,11 @@
 @section('content')
 
     <h3>Standard Entries</h3>
-    <table id="topGrid"></table>
+    <table id="topGrid"><th></th></table>
     <div id="topGridPager"></div>
     <hr>
 
-    <table id="bottomGrid"></table>
+    <table id="bottomGrid"><th></th></table>
     <div id="bottomGridPager"></div>
 
     <div id="dialogAddNew" title="Add New Standard Entry" style="display:none;">

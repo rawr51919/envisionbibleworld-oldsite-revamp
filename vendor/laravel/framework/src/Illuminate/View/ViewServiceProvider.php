@@ -1,129 +1,179 @@
-<?php namespace Illuminate\View;
+<?php
 
-use Illuminate\View\Engines\PhpEngine;
+namespace Illuminate\View;
+
+use Illuminate\Container\Container;
 use Illuminate\Support\ServiceProvider;
+use Illuminate\View\Compilers\BladeCompiler;
 use Illuminate\View\Engines\CompilerEngine;
 use Illuminate\View\Engines\EngineResolver;
-use Illuminate\View\Compilers\BladeCompiler;
+use Illuminate\View\Engines\FileEngine;
+use Illuminate\View\Engines\PhpEngine;
 
-class ViewServiceProvider extends ServiceProvider {
+class ViewServiceProvider extends ServiceProvider
+{
+    /**
+     * Register the service provider.
+     *
+     * @return void
+     */
+    public function register()
+    {
+        $this->registerFactory();
+        $this->registerViewFinder();
+        $this->registerBladeCompiler();
+        $this->registerEngineResolver();
 
-	/**
-	 * Register the service provider.
-	 *
-	 * @return void
-	 */
-	public function register()
-	{
-		$this->registerEngineResolver();
+        $this->app->terminating(static function () {
+            Component::flushCache();
+        });
+    }
 
-		$this->registerViewFinder();
+    /**
+     * Register the view environment.
+     *
+     * @return void
+     */
+    public function registerFactory()
+    {
+        $this->app->singleton('view', function ($app) {
+            // Next we need to grab the engine resolver instance that will be used by the
+            // environment. The resolver will be used by an environment to get each of
+            // the various engine implementations such as plain PHP or Blade engine.
+            $resolver = $app['view.engine.resolver'];
 
-		$this->registerFactory();
-	}
+            $finder = $app['view.finder'];
 
-	/**
-	 * Register the engine resolver instance.
-	 *
-	 * @return void
-	 */
-	public function registerEngineResolver()
-	{
-		$this->app->singleton('view.engine.resolver', function()
-		{
-			$resolver = new EngineResolver;
+            $factory = $this->createFactory($resolver, $finder, $app['events']);
 
-			// Next we will register the various engines with the resolver so that the
-			// environment can resolve the engines it needs for various views based
-			// on the extension of view files. We call a method for each engines.
-			foreach (array('php', 'blade') as $engine)
-			{
-				$this->{'register'.ucfirst($engine).'Engine'}($resolver);
-			}
+            // We will also set the container instance on this view environment since the
+            // view composers may be classes registered in the container, which allows
+            // for great testable, flexible composers for the application developer.
+            $factory->setContainer($app);
 
-			return $resolver;
-		});
-	}
+            $factory->share('app', $app);
 
-	/**
-	 * Register the PHP engine implementation.
-	 *
-	 * @param  \Illuminate\View\Engines\EngineResolver  $resolver
-	 * @return void
-	 */
-	public function registerPhpEngine($resolver)
-	{
-		$resolver->register('php', function() { return new PhpEngine; });
-	}
+            $app->terminating(static function () {
+                Component::forgetFactory();
+            });
 
-	/**
-	 * Register the Blade engine implementation.
-	 *
-	 * @param  \Illuminate\View\Engines\EngineResolver  $resolver
-	 * @return void
-	 */
-	public function registerBladeEngine($resolver)
-	{
-		$app = $this->app;
+            return $factory;
+        });
+    }
 
-		// The Compiler engine requires an instance of the CompilerInterface, which in
-		// this case will be the Blade compiler, so we'll first create the compiler
-		// instance to pass into the engine so it can compile the views properly.
-		$app->singleton('blade.compiler', function($app)
-		{
-			$cache = $app['config']['view.compiled'];
+    /**
+     * Create a new Factory Instance.
+     *
+     * @param  \Illuminate\View\Engines\EngineResolver  $resolver
+     * @param  \Illuminate\View\ViewFinderInterface  $finder
+     * @param  \Illuminate\Contracts\Events\Dispatcher  $events
+     * @return \Illuminate\View\Factory
+     */
+    protected function createFactory($resolver, $finder, $events)
+    {
+        return new Factory($resolver, $finder, $events);
+    }
 
-			return new BladeCompiler($app['files'], $cache);
-		});
+    /**
+     * Register the view finder implementation.
+     *
+     * @return void
+     */
+    public function registerViewFinder()
+    {
+        $this->app->bind('view.finder', function ($app) {
+            return new FileViewFinder($app['files'], $app['config']['view.paths']);
+        });
+    }
 
-		$resolver->register('blade', function() use ($app)
-		{
-			return new CompilerEngine($app['blade.compiler'], $app['files']);
-		});
-	}
+    /**
+     * Register the Blade compiler implementation.
+     *
+     * @return void
+     */
+    public function registerBladeCompiler()
+    {
+        $this->app->singleton('blade.compiler', function ($app) {
+            return tap(new BladeCompiler(
+                $app['files'],
+                $app['config']['view.compiled'],
+                $app['config']->get('view.relative_hash', false) ? $app->basePath() : '',
+                $app['config']->get('view.cache', true),
+                $app['config']->get('view.compiled_extension', 'php'),
+            ), function ($blade) {
+                $blade->component('dynamic-component', DynamicComponent::class);
+            });
+        });
+    }
 
-	/**
-	 * Register the view finder implementation.
-	 *
-	 * @return void
-	 */
-	public function registerViewFinder()
-	{
-		$this->app->bind('view.finder', function($app)
-		{
-			$paths = $app['config']['view.paths'];
+    /**
+     * Register the engine resolver instance.
+     *
+     * @return void
+     */
+    public function registerEngineResolver()
+    {
+        $this->app->singleton('view.engine.resolver', function () {
+            $resolver = new EngineResolver;
 
-			return new FileViewFinder($app['files'], $paths);
-		});
-	}
+            // Next, we will register the various view engines with the resolver so that the
+            // environment will resolve the engines needed for various views based on the
+            // extension of view file. We call a method for each of the view's engines.
+            foreach (['file', 'php', 'blade'] as $engine) {
+                $this->{'register'.ucfirst($engine).'Engine'}($resolver);
+            }
 
-	/**
-	 * Register the view environment.
-	 *
-	 * @return void
-	 */
-	public function registerFactory()
-	{
-		$this->app->singleton('view', function($app)
-		{
-			// Next we need to grab the engine resolver instance that will be used by the
-			// environment. The resolver will be used by an environment to get each of
-			// the various engine implementations such as plain PHP or Blade engine.
-			$resolver = $app['view.engine.resolver'];
+            return $resolver;
+        });
+    }
 
-			$finder = $app['view.finder'];
+    /**
+     * Register the file engine implementation.
+     *
+     * @param  \Illuminate\View\Engines\EngineResolver  $resolver
+     * @return void
+     */
+    public function registerFileEngine($resolver)
+    {
+        $resolver->register('file', function () {
+            return new FileEngine(Container::getInstance()->make('files'));
+        });
+    }
 
-			$env = new Factory($resolver, $finder, $app['events']);
+    /**
+     * Register the PHP engine implementation.
+     *
+     * @param  \Illuminate\View\Engines\EngineResolver  $resolver
+     * @return void
+     */
+    public function registerPhpEngine($resolver)
+    {
+        $resolver->register('php', function () {
+            return new PhpEngine(Container::getInstance()->make('files'));
+        });
+    }
 
-			// We will also set the container instance on this view environment since the
-			// view composers may be classes registered in the container, which allows
-			// for great testable, flexible composers for the application developer.
-			$env->setContainer($app);
+    /**
+     * Register the Blade engine implementation.
+     *
+     * @param  \Illuminate\View\Engines\EngineResolver  $resolver
+     * @return void
+     */
+    public function registerBladeEngine($resolver)
+    {
+        $resolver->register('blade', function () {
+            $app = Container::getInstance();
 
-			$env->share('app', $app);
+            $compiler = new CompilerEngine(
+                $app->make('blade.compiler'),
+                $app->make('files'),
+            );
 
-			return $env;
-		});
-	}
+            $app->terminating(static function () use ($compiler) {
+                $compiler->forgetCompiledOrNotExpired();
+            });
 
+            return $compiler;
+        });
+    }
 }

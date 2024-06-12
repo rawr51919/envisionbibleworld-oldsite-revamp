@@ -1,46 +1,64 @@
-<?php namespace Illuminate\Contracts\Console;
+<?php
 
-interface Kernel {
+namespace Illuminate\Contracts\Console;
 
-	/**
-	 * Handle an incoming console command.
-	 *
-	 * @param  \Symfony\Component\Console\Input\InputInterface  $input
-	 * @param  \Symfony\Component\Console\Output\OutputInterface  $output
-	 * @return int
-	 */
-	public function handle($input, $output = null);
+interface Kernel
+{
+    /**
+     * Bootstrap the application for artisan commands.
+     *
+     * @return void
+     */
+    public function bootstrap();
 
-	/**
-	 * Run an Artisan console command by name.
-	 *
-	 * @param  string  $command
-	 * @param  array  $parameters
-	 * @return int
-	 */
-	public function call($command, array $parameters = array());
+    /**
+     * Handle an incoming console command.
+     *
+     * @param  \Symfony\Component\Console\Input\InputInterface  $input
+     * @param  \Symfony\Component\Console\Output\OutputInterface|null  $output
+     * @return int
+     */
+    public function handle($input, $output = null);
 
-	/**
-	 * Queue an Artisan console command by name.
-	 *
-	 * @param  string  $command
-	 * @param  array  $parameters
-	 * @return int
-	 */
-	public function queue($command, array $parameters = array());
+    /**
+     * Run an Artisan console command by name.
+     *
+     * @param  string  $command
+     * @param  array  $parameters
+     * @param  \Symfony\Component\Console\Output\OutputInterface|null  $outputBuffer
+     * @return int
+     */
+    public function call($command, array $parameters = [], $outputBuffer = null);
 
-	/**
-	 * Get all of the commands registered with the console.
-	 *
-	 * @return array
-	 */
-	public function all();
+    /**
+     * Queue an Artisan console command by name.
+     *
+     * @param  string  $command
+     * @param  array  $parameters
+     * @return \Illuminate\Foundation\Bus\PendingDispatch
+     */
+    public function queue($command, array $parameters = []);
 
-	/**
-	 * Get the output for the last run command.
-	 *
-	 * @return string
-	 */
-	public function output();
+    /**
+     * Get all of the commands registered with the console.
+     *
+     * @return array
+     */
+    public function all();
 
+    /**
+     * Get the output for the last run command.
+     *
+     * @return string
+     */
+    public function output();
+
+    /**
+     * Terminate the application.
+     *
+     * @param  \Symfony\Component\Console\Input\InputInterface  $input
+     * @param  int  $status
+     * @return void
+     */
+    public function terminate($input, $status);
 }

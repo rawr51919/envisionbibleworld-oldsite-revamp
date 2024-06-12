@@ -1,4 +1,6 @@
-<?php namespace App\Http\Controllers;
+<?php
+
+namespace App\Http\Controllers;
 
 use App\Category;
 use App\Http\Requests;
@@ -6,7 +8,9 @@ use App\Http\Controllers\Controller;
 use Yajra\Datatables\Datatables;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-class DatatablesController extends Controller {
+
+class DatatablesController extends Controller
+{
 
     public function getIndex()
     {
@@ -20,9 +24,7 @@ class DatatablesController extends Controller {
      */
     public function anyData()
     {
-        //$query = Category::query('CategoryId', 'Category', 'Explanation');
         $categories = Category::query();
         return Datatables::of($categories)->make(true);
     }
-
 }

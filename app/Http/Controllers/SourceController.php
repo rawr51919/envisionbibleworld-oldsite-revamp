@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Http\Controllers;
 
 use App\Http\Requests;
@@ -12,7 +13,9 @@ use App\Source;
 use Yajra\Datatables\Facades\Datatables;
 use App\StatusType;
 use App\SourceType;
-class SourceController extends Controller {
+
+class SourceController extends Controller
+{
 
 
     public function __construct()
@@ -29,19 +32,19 @@ class SourceController extends Controller {
         return view('source.index');
     }
 
-    public function getSources() {
+    public function getSources()
+    {
 
         $page = $_GET['page'];
         $limit = $_GET['rows'];
         $sidx = $_GET['sidx'];
-        $sidx = 'SourceId';
         $sord = $_GET['sord'];
 
-        $fields = explode(', ', $sidx.''.$sord);
+        // $fields = explode(', ', $sidx.''.$sord); (unused for now)
 
         $count = Source::all()->count();
-        if( $count > 0 && $limit > 0) {
-            $total_pages = ceil($count/$limit);
+        if ($count > 0 && $limit > 0) {
+            $total_pages = ceil($count / $limit);
         } else {
             $total_pages = 0;
         }
@@ -56,58 +59,60 @@ class SourceController extends Controller {
             $start = 0;
         }
 
-        $sources = Source:://leftJoin('tblStatusType', 'tblSource.StatusTypeId', '=', 'tblStatusType.StatusTypeId')
+        $sources = Source:: //leftJoin('tblStatusType', 'tblSource.StatusTypeId', '=', 'tblStatusType.StatusTypeId')
             /*->*/leftJoin('tblSource_Type', 'tblSource.Source_TypeId', '=', 'tblSource_Type.Source_TypeId')
-//			->leftJoin('tblPublisher', 'tblSource.PublisherId', '=', 'tblPublisher.PublisherId')
-            ->select('tblSource.SourceId',
+            //			->leftJoin('tblPublisher', 'tblSource.PublisherId', '=', 'tblPublisher.PublisherId')
+            ->select(
+                'tblSource.SourceId',
                 'tblSource.Source_TypeId',
                 'tblSource.SourceName',
-//				'tblSource.StatusTypeId',
+                //				'tblSource.StatusTypeId',
                 'tblSource.LastChptrOrSection',
-//				'tblSource.ChptrOfLastVrs',
-//				'tblSource.LastVerseOrPage',
-//				'tblSource.ScreenShotName',
-//				'tblSource.PublisherId',
-//				'tblSource.EntryDate',
-//				'tblStatusType.StatusType',
-                'tblSource_Type.Source_Type_Abbreviation'//,
-//				'tblPublisher.PublisherName'
+                //				'tblSource.ChptrOfLastVrs',
+                //				'tblSource.LastVerseOrPage',
+                //				'tblSource.ScreenShotName',
+                //				'tblSource.PublisherId',
+                //				'tblSource.EntryDate',
+                //				'tblStatusType.StatusType',
+                'tblSource_Type.Source_Type_Abbreviation' //,
+                //				'tblPublisher.PublisherName'
             )
             ->skip($start)->take($limit)
             ->orderBy($sidx, $sord)
             ->get();
 
-        $res = array('page'=>$page,'total'=>$total_pages, 'records'=>$count, 'rows'=>$sources);
+        $res = array('page' => $page, 'total' => $total_pages, 'records' => $count, 'rows' => $sources);
         return response()->json($res);
     }
 
 
-    
-    public function postDeleteSource(Request $request) {
+
+    public function postDeleteSource(Request $request)
+    {
         $id = $request->SourceId;
-        try{
+        try {
 
             DB::beginTransaction();
 
             $source = Source::find($id);
             $source->delete();
-
         } catch (\Exception $e) {
             DB::rollback();
-            return response()->json(array('result'=>false, 'msg'=>'Deleted failed!!'));
+            return response()->json(array('result' => false, 'msg' => 'Deleted failed!!'));
         }
         DB::commit();
 
-        return response()->json(array('result'=>true, 'msg'=>'Successfully Deleted!!'));
+        return response()->json(array('result' => true, 'msg' => 'Successfully Deleted!!'));
     }
 
-    public function postUpdateSource(Request $request) {
+    public function postUpdateSource(Request $request)
+    {
         //Get Category ID and changing data
         $id = $request->SourceId;
 
 
-        try{
-            if(is_numeric($id)) {
+        try {
+            if (is_numeric($id)) {
                 $source = Source::find($id);
                 $source->SourceName = $request->SourceName;
                 $source->Source_TypeId = $request->Source_Type_Abbreviation;
@@ -122,47 +127,50 @@ class SourceController extends Controller {
             }
         } catch (\Exception $e) {
             DB::rollback();
-            return response()->json(array('result'=>false, 'msg'=>'Update failed!!'));
+            return response()->json(array('result' => false, 'msg' => 'Update failed!!'));
         }
         DB::commit();
 
-        return response()->json(array('result'=>true, 'msg'=>'Successfully updated!!'));
+        return response()->json(array('result' => true, 'msg' => 'Successfully updated!!'));
     }
 
-    public function getStatusTypes() {
+    public function getStatusTypes()
+    {
 
         $statustypes = StatusType::lists('StatusType', 'StatusTypeId');
 
         return response()->json($statustypes);
     }
 
-    public function getPublishers() {
+    public function getPublishers()
+    {
         $publishers = Publisher::lists('PublisherName', 'PublisherId');
 
         return response()->json($publishers);
     }
 
-    public function getSourceTypes() {
+    public function getSourceTypes()
+    {
 
-        $sourcetypes = SourceType::lists('Source_Type_Abbreviation','Source_TypeId');
+        $sourcetypes = SourceType::lists('Source_Type_Abbreviation', 'Source_TypeId');
 
         return response()->json($sourcetypes);
     }
 
-    public function getSourceDetails(Request $request) {
+    public function getSourceDetails(Request $request)
+    {
         $id = $request->rowId;
 
         $page = $_GET['page'];
         $limit = $_GET['rows'];
         $sidx = $_GET['sidx'];
-        $sidx = 'Source_DetailId';
         $sord = $_GET['sord'];
 
-        $fields = explode(', ', $sidx.''.$sord);
+        // $fields = explode(', ', $sidx.''.$sord); (unused for now)
 
         $count = SourceDetail::where('SourceId', '=', $id)->count();
-        if( $count > 0 && $limit > 0) {
-            $total_pages = ceil($count/$limit);
+        if ($count > 0 && $limit > 0) {
+            $total_pages = ceil($count / $limit);
         } else {
             $total_pages = 0;
         }
@@ -179,7 +187,8 @@ class SourceController extends Controller {
 
         $sources = SourceDetail::leftJoin('tblStatusType', 'tblSource_Detail.StatusTypeId', '=', 'tblStatusType.StatusTypeId')
             ->leftJoin('tblPublisher', 'tblSource_Detail.PublisherId', '=', 'tblPublisher.PublisherId')
-            ->select('tblSource_Detail.Source_DetailId',
+            ->select(
+                'tblSource_Detail.Source_DetailId',
                 'tblSource_Detail.SourceId',
                 'tblSource_Detail.StatusTypeId',
                 'tblSource_Detail.ChptrOfLastVrs',
@@ -195,16 +204,17 @@ class SourceController extends Controller {
             ->orderBy($sidx, $sord)
             ->get();
 
-        $res = array('page'=>$page,'total'=>$total_pages, 'records'=>$count, 'rows'=>$sources);
+        $res = array('page' => $page, 'total' => $total_pages, 'records' => $count, 'rows' => $sources);
         return response()->json($res);
     }
 
-    public function postEditSourceDetail(Request $request) {
+    public function postEditSourceDetail(Request $request)
+    {
         $id = $request->id;
 
 
-        try{
-            if(is_numeric($id)) {
+        try {
+            if (is_numeric($id)) {
                 $source = SourceDetail::find($id);
                 $source->ChptrOfLastVrs = $request->ChptrOfLastVrs;
                 $source->LastVerseOrPage = $request->LastVerseOrPage;
@@ -213,8 +223,8 @@ class SourceController extends Controller {
                     $source->PublisherId = null;
                 } else {
                     $source->PublisherId = $request->PublisherName;
-                $source->StatusTypeId = $request->StatusType;
-                $source->save();
+                    $source->StatusTypeId = $request->StatusType;
+                    $source->save();
                 }
             } else {
                 $source = new SourceDetail();
@@ -226,20 +236,21 @@ class SourceController extends Controller {
                     $source->PublisherId = null;
                 } else {
                     $source->PublisherId = $request->PublisherName;
-                $source->StatusTypeId = $request->StatusType;
-                $source->save();
+                    $source->StatusTypeId = $request->StatusType;
+                    $source->save();
                 }
             }
         } catch (\Exception $e) {
             DB::rollback();
-            return response()->json(array('result'=>false, 'msg'=>'Update failed!!'));
+            return response()->json(array('result' => false, 'msg' => 'Update failed!!'));
         }
         DB::commit();
 
-        return response()->json(array('result'=>true, 'msg'=>'Successfully updated!!'));
+        return response()->json(array('result' => true, 'msg' => 'Successfully updated!!'));
     }
 
-    public function postDeleteSourceDetail(Request $request) {
+    public function postDeleteSourceDetail(Request $request)
+    {
         $id = $request->id;
         try {
 
@@ -247,18 +258,17 @@ class SourceController extends Controller {
 
             $sourcedetail = SourceDetail::find($id);
             $sourcedetail->delete();
-
         } catch (\Exception $e) {
             DB::rollback();
-            return response()->json(array('result'=>false, 'msg'=>'Delete failed!!'));
+            return response()->json(array('result' => false, 'msg' => 'Delete failed!!'));
         }
         DB::commit();
 
-        return response()->json(array('result'=>true, 'msg'=>'Successfully Deleted!!'));
+        return response()->json(array('result' => true, 'msg' => 'Successfully Deleted!!'));
     }
 
-    public function postAddSourceDetail(Request $request) {
-        // TODO: Implement this
+    public function postAddSourceDetail(Request $request)
+    {
+        // blank
     }
-
 }

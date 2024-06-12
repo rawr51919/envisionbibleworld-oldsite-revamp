@@ -1,90 +1,141 @@
-<?php namespace Illuminate\Cache;
+<?php
 
-class RedisTaggedCache extends TaggedCache {
+namespace Illuminate\Cache;
 
-	/**
-	 * Store an item in the cache indefinitely.
-	 *
-	 * @param  string  $key
-	 * @param  mixed   $value
-	 * @return void
-	 */
-	public function forever($key, $value)
-	{
-		$this->pushForeverKeys($namespace = $this->tags->getNamespace(), $key);
+class RedisTaggedCache extends TaggedCache
+{
+    /**
+     * Store an item in the cache if the key does not exist.
+     *
+     * @param  string  $key
+     * @param  mixed  $value
+     * @param  \DateTimeInterface|\DateInterval|int|null  $ttl
+     * @return bool
+     */
+    public function add($key, $value, $ttl = null)
+    {
+        $seconds = null;
 
-		$this->store->forever(sha1($namespace).':'.$key, $value);
-	}
+        if ($ttl !== null) {
+            $seconds = $this->getSeconds($ttl);
 
-	/**
-	 * Remove all items from the cache.
-	 *
-	 * @return void
-	 */
-	public function flush()
-	{
-		$this->deleteForeverKeys();
+            if ($seconds > 0) {
+                $this->tags->addEntry(
+                    $this->itemKey($key),
+                    $seconds
+                );
+            }
+        }
 
-		parent::flush();
-	}
+        return parent::add($key, $value, $ttl);
+    }
 
-	/**
-	 * Store a copy of the full key for each namespace segment.
-	 *
-	 * @param  string  $namespace
-	 * @param  string  $key
-	 * @return void
-	 */
-	protected function pushForeverKeys($namespace, $key)
-	{
-		$fullKey = $this->getPrefix().sha1($namespace).':'.$key;
+    /**
+     * Store an item in the cache.
+     *
+     * @param  string  $key
+     * @param  mixed  $value
+     * @param  \DateTimeInterface|\DateInterval|int|null  $ttl
+     * @return bool
+     */
+    public function put($key, $value, $ttl = null)
+    {
+        if (is_null($ttl)) {
+            return $this->forever($key, $value);
+        }
 
-		foreach (explode('|', $namespace) as $segment)
-		{
-			$this->store->connection()->lpush($this->foreverKey($segment), $fullKey);
-		}
-	}
+        $seconds = $this->getSeconds($ttl);
 
-	/**
-	 * Delete all of the items that were stored forever.
-	 *
-	 * @return void
-	 */
-	protected function deleteForeverKeys()
-	{
-		foreach (explode('|', $this->tags->getNamespace()) as $segment)
-		{
-			$this->deleteForeverValues($segment = $this->foreverKey($segment));
+        if ($seconds > 0) {
+            $this->tags->addEntry(
+                $this->itemKey($key),
+                $seconds
+            );
+        }
 
-			$this->store->connection()->del($segment);
-		}
-	}
+        return parent::put($key, $value, $ttl);
+    }
 
-	/**
-	 * Delete all of the keys that have been stored forever.
-	 *
-	 * @param  string  $foreverKey
-	 * @return void
-	 */
-	protected function deleteForeverValues($foreverKey)
-	{
-		$forever = array_unique($this->store->connection()->lrange($foreverKey, 0, -1));
+    /**
+     * Increment the value of an item in the cache.
+     *
+     * @param  string  $key
+     * @param  mixed  $value
+     * @return int|bool
+     */
+    public function increment($key, $value = 1)
+    {
+        $this->tags->addEntry($this->itemKey($key), updateWhen: 'NX');
 
-		if (count($forever) > 0)
-		{
-			call_user_func_array(array($this->store->connection(), 'del'), $forever);
-		}
-	}
+        return parent::increment($key, $value);
+    }
 
-	/**
-	 * Get the forever reference key for the segment.
-	 *
-	 * @param  string  $segment
-	 * @return string
-	 */
-	protected function foreverKey($segment)
-	{
-		return $this->getPrefix().$segment.':forever';
-	}
+    /**
+     * Decrement the value of an item in the cache.
+     *
+     * @param  string  $key
+     * @param  mixed  $value
+     * @return int|bool
+     */
+    public function decrement($key, $value = 1)
+    {
+        $this->tags->addEntry($this->itemKey($key), updateWhen: 'NX');
 
+        return parent::decrement($key, $value);
+    }
+
+    /**
+     * Store an item in the cache indefinitely.
+     *
+     * @param  string  $key
+     * @param  mixed  $value
+     * @return bool
+     */
+    public function forever($key, $value)
+    {
+        $this->tags->addEntry($this->itemKey($key));
+
+        return parent::forever($key, $value);
+    }
+
+    /**
+     * Remove all items from the cache.
+     *
+     * @return bool
+     */
+    public function flush()
+    {
+        $this->flushValues();
+        $this->tags->flush();
+
+        return true;
+    }
+
+    /**
+     * Flush the individual cache entries for the tags.
+     *
+     * @return void
+     */
+    protected function flushValues()
+    {
+        $entries = $this->tags->entries()
+            ->map(fn (string $key) => $this->store->getPrefix().$key)
+            ->chunk(1000);
+
+        foreach ($entries as $cacheKeys) {
+            $this->store->connection()->del(...$cacheKeys);
+        }
+    }
+
+    /**
+     * Remove all stale reference entries from the tag set.
+     *
+     * @return bool
+     */
+    public function flushStale()
+    {
+        $this->tags->flushStaleEntries();
+
+        return true;
+    }
 }

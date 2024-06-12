@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Http\Controllers;
 
 use App\Http\Requests;
@@ -8,7 +9,8 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
 use Illuminate\Session;
 
-class SummaryController extends Controller {
+class SummaryController extends Controller
+{
 
     public function __construct()
     {
@@ -24,18 +26,19 @@ class SummaryController extends Controller {
         return view('summary.index');
     }
 
-    public function getSummaries() {
+    public function getSummaries()
+    {
 
         $page = $_GET['page'];
         $limit = $_GET['rows'];
         $sidx = $_GET['sidx'];
         $sord = $_GET['sord'];
 
-        $fields = explode(', ', $sidx.''.$sord);
+        // $fields = explode(', ', $sidx.''.$sord); (unused for now)
 
         $count = Summary::all()->count();
-        if( $count > 0 && $limit > 0) {
-            $total_pages = ceil($count/$limit);
+        if ($count > 0 && $limit > 0) {
+            $total_pages = ceil($count / $limit);
         } else {
             $total_pages = 0;
         }
@@ -56,37 +59,38 @@ class SummaryController extends Controller {
             ->orderBy($sidx, $sord)
             ->get();
 
-        $res = array('page'=>$page,'total'=>$total_pages, 'records'=>$count, 'rows'=>$summaries);
+        $res = array('page' => $page, 'total' => $total_pages, 'records' => $count, 'rows' => $summaries);
         return response()->json($res);
     }
 
-    public function postDeleteSummary(Request $request) {
+    public function postDeleteSummary(Request $request)
+    {
         $id = $request->SummaryId;
 
-        try{
+        try {
 
             DB::beginTransaction();
 
             $summary = Summary::find($id);
             $summary->delete();
-
         } catch (\Exception $e) {
             DB::rollback();
-            return response()->json(array('result'=>false, 'msg'=>'Deleted failed!!'));
+            return response()->json(array('result' => false, 'msg' => 'Deleted failed!!'));
         }
         DB::commit();
 
-        return response()->json(array('result'=>true, 'msg'=>'Successfully Deleted!!'));
+        return response()->json(array('result' => true, 'msg' => 'Successfully Deleted!!'));
     }
 
-    public function postUpdateSummary(Request $request) {
+    public function postUpdateSummary(Request $request)
+    {
         //Get Category ID and changing data
         $id = $request->SummaryId;
 
-        try{
+        try {
             DB::beginTransaction();
 
-            if(is_numeric($id)) {
+            if (is_numeric($id)) {
                 $summary = Summary::find($id);
                 $summary->Summary = $request->Summary;
                 $summary->StatusTypeId = $request->StatusTypeId;
@@ -167,5 +171,4 @@ class SummaryController extends Controller {
     {
         //
     }
-
 }

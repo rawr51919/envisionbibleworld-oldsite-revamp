@@ -1,41 +1,151 @@
-<?php namespace Illuminate\Database\Schema;
+<?php
 
-class MySqlBuilder extends Builder {
+namespace Illuminate\Database\Schema;
 
-	/**
-	 * Determine if the given table exists.
-	 *
-	 * @param  string  $table
-	 * @return bool
-	 */
-	public function hasTable($table)
-	{
-		$sql = $this->grammar->compileTableExists();
+class MySqlBuilder extends Builder
+{
+    /**
+     * Create a database in the schema.
+     *
+     * @param  string  $name
+     * @return bool
+     */
+    public function createDatabase($name)
+    {
+        return $this->connection->statement(
+            $this->grammar->compileCreateDatabase($name, $this->connection)
+        );
+    }
 
-		$database = $this->connection->getDatabaseName();
+    /**
+     * Drop a database from the schema if the database exists.
+     *
+     * @param  string  $name
+     * @return bool
+     */
+    public function dropDatabaseIfExists($name)
+    {
+        return $this->connection->statement(
+            $this->grammar->compileDropDatabaseIfExists($name)
+        );
+    }
 
-		$table = $this->connection->getTablePrefix().$table;
+    /**
+     * Get the tables for the database.
+     *
+     * @return array
+     */
+    public function getTables()
+    {
+        return $this->connection->getPostProcessor()->processTables(
+            $this->connection->selectFromWriteConnection(
+                $this->grammar->compileTables($this->connection->getDatabaseName())
+            )
+        );
+    }
 
-		return count($this->connection->select($sql, array($database, $table))) > 0;
-	}
+    /**
+     * Get the views for the database.
+     *
+     * @return array
+     */
+    public function getViews()
+    {
+        return $this->connection->getPostProcessor()->processViews(
+            $this->connection->selectFromWriteConnection(
+                $this->grammar->compileViews($this->connection->getDatabaseName())
+            )
+        );
+    }
 
-	/**
-	 * Get the column listing for a given table.
-	 *
-	 * @param  string  $table
-	 * @return array
-	 */
-	public function getColumnListing($table)
-	{
-		$sql = $this->grammar->compileColumnExists();
+    /**
+     * Get the columns for a given table.
+     *
+     * @param  string  $table
+     * @return array
+     */
+    public function getColumns($table)
+    {
+        $table = $this->connection->getTablePrefix().$table;
 
-		$database = $this->connection->getDatabaseName();
+        $results = $this->connection->selectFromWriteConnection(
+            $this->grammar->compileColumns($this->connection->getDatabaseName(), $table)
+        );
 
-		$table = $this->connection->getTablePrefix().$table;
+        return $this->connection->getPostProcessor()->processColumns($results);
+    }
 
-		$results = $this->connection->select($sql, array($database, $table));
+    /**
+     * Get the indexes for a given table.
+     *
+     * @param  string  $table
+     * @return array
+     */
+    public function getIndexes($table)
+    {
+        $table = $this->connection->getTablePrefix().$table;
 
-		return $this->connection->getPostProcessor()->processColumnListing($results);
-	}
+        return $this->connection->getPostProcessor()->processIndexes(
+            $this->connection->selectFromWriteConnection(
+                $this->grammar->compileIndexes($this->connection->getDatabaseName(), $table)
+            )
+        );
+    }
 
+    /**
+     * Get the foreign keys for a given table.
+     *
+     * @param  string  $table
+     * @return array
+     */
+    public function getForeignKeys($table)
+    {
+        $table = $this->connection->getTablePrefix().$table;
+
+        return $this->connection->getPostProcessor()->processForeignKeys(
+            $this->connection->selectFromWriteConnection(
+                $this->grammar->compileForeignKeys($this->connection->getDatabaseName(), $table)
+            )
+        );
+    }
+
+    /**
+     * Drop all tables from the database.
+     *
+     * @return void
+     */
+    public function dropAllTables()
+    {
+        $tables = array_column($this->getTables(), 'name');
+
+        if (empty($tables)) {
+            return;
+        }
+
+        $this->disableForeignKeyConstraints();
+
+        $this->connection->statement(
+            $this->grammar->compileDropAllTables($tables)
+        );
+
+        $this->enableForeignKeyConstraints();
+    }
+
+    /**
+     * Drop all views from the database.
+     *
+     * @return void
+     */
+    public function dropAllViews()
+    {
+        $views = array_column($this->getViews(), 'name');
+
+        if (empty($views)) {
+            return;
+        }
+
+        $this->connection->statement(
+            $this->grammar->compileDropAllViews($views)
+        );
+    }
 }

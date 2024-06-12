@@ -1,14 +1,17 @@
 <?php
+
 namespace App\Http\Controllers;
 
 use App\Http\Requests;
+use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
 use App\SubCategory;
 use App\Category;
 use Illuminate\Http\Request;
 use Yajra\Datatables\Datatables;
 
-class SubCategoryController extends Controller {
+class SubCategoryController extends Controller
+{
 
     public function __construct()
     {
@@ -26,7 +29,8 @@ class SubCategoryController extends Controller {
         return view('subcategory.index', compact('categories'));
     }
 
-    public function getSubcategories(Request $request) {
+    public function getSubcategories(Request $request)
+    {
         $id = $request->CategoryId;
 
 
@@ -35,11 +39,11 @@ class SubCategoryController extends Controller {
         $sidx = $_GET['sidx'];
         $sord = $_GET['sord'];
 
-        $fields = explode(', ', $sidx.''.$sord);
+        // $fields = explode(', ', $sidx.''.$sord); (unused for now)
 
         $count = SubCategory::where('CategoryId', '=', $id)->count();
-        if( $count > 0 && $limit > 0) {
-            $total_pages = ceil($count/$limit);
+        if ($count > 0 && $limit > 0) {
+            $total_pages = ceil($count / $limit);
         } else {
             $total_pages = 0;
         }
@@ -60,45 +64,46 @@ class SubCategoryController extends Controller {
             ->orderBy($sidx, $sord)
             ->get();
 
-        $res = array('page'=>$page,'total'=>$total_pages, 'records'=>$count, 'rows'=>$subcategories);
+        $res = array('page' => $page, 'total' => $total_pages, 'records' => $count, 'rows' => $subcategories);
         return response()->json($res);
     }
 
-    public function postDeleteSubcategory(Request $request) {
+    public function postDeleteSubcategory(Request $request)
+    {
         //Get Category ID and changing data
         $id = $request->CategoryId;
 
-        try{
+        try {
 
             DB::beginTransaction();
 
             $subcategory = SubCategory::find($id);
             $subcategory->delete();
-
         } catch (\Exception $e) {
             DB::rollback();
-            return response()->json(array('result'=>false, 'msg'=>'Deleted failed!!'));
+            return response()->json(array('result' => false, 'msg' => 'Deleted failed!!'));
         }
         DB::commit();
 
-        return response()->json(array('result'=>true, 'msg'=>'Successfully Deleted!!'));
+        return response()->json(array('result' => true, 'msg' => 'Successfully Deleted!!'));
     }
 
-    public function postUpdateSubcategory(Request $request) {
+    public function postUpdateSubcategory(Request $request)
+    {
         //Get Category ID and changing data
         $id = $request->SubcategoryId;
 
         //Get Summary_Details data to get summaryId and quotationId
 
-        try{
-            if(is_numeric($id)) {
+        try {
+            if (is_numeric($id)) {
                 $subcategory = SubCategory::find($id);
                 $subcategory->Subcategory = $request->Subcategory;
                 $subcategory->CategoryId = $request->CategoryId;
                 $subcategory->Subcategory_Explanation = $request->Subcategory_Explanation;
                 $subcategory->StatusTypeId = $request->StatusTypeId;
                 $subcategory->save();
-            }else{
+            } else {
                 $newSubCategory = new SubCategory();
                 $newSubCategory->Subcategory = $request->Subcategory;
                 $newSubCategory->CategoryId = $request->CategoryId;
@@ -106,14 +111,13 @@ class SubCategoryController extends Controller {
                 $newSubCategory->StatusTypeId = $request->StatusTypeId;
                 $newSubCategory->save();
             }
-
         } catch (\Exception $e) {
             DB::rollback();
-            return response()->json(array('result'=>false, 'msg'=>'Update failed!!'));
+            return response()->json(array('result' => false, 'msg' => 'Update failed!!'));
         }
         DB::commit();
 
-        return response()->json(array('result'=>true, 'msg'=>'Successfully Updated!!'));
+        return response()->json(array('result' => true, 'msg' => 'Successfully Updated!!'));
     }
 
     /**
@@ -146,7 +150,7 @@ class SubCategoryController extends Controller {
     {
         $category = Category::find($id);
 
-        $categoryid = $category->CategoryId;
+        // $categoryid = $category->CategoryId; (unused for now)
 
         return view('subcategory.show', compact('category'));
     }
@@ -183,5 +187,4 @@ class SubCategoryController extends Controller {
     {
         //
     }
-
 }

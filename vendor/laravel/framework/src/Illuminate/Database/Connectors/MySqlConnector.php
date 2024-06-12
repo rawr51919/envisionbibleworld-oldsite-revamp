@@ -1,101 +1,154 @@
-<?php namespace Illuminate\Database\Connectors;
+<?php
 
-class MySqlConnector extends Connector implements ConnectorInterface {
+namespace Illuminate\Database\Connectors;
 
-	/**
-	 * Establish a database connection.
-	 *
-	 * @param  array  $config
-	 * @return \PDO
-	 */
-	public function connect(array $config)
-	{
-		$dsn = $this->getDsn($config);
+use PDO;
 
-		$options = $this->getOptions($config);
+class MySqlConnector extends Connector implements ConnectorInterface
+{
+    /**
+     * Establish a database connection.
+     *
+     * @param  array  $config
+     * @return \PDO
+     */
+    public function connect(array $config)
+    {
+        $dsn = $this->getDsn($config);
 
-		// We need to grab the PDO options that should be used while making the brand
-		// new connection instance. The PDO options control various aspects of the
-		// connection's behavior, and some might be specified by the developers.
-		$connection = $this->createConnection($dsn, $config, $options);
+        $options = $this->getOptions($config);
 
-		if (isset($config['unix_socket']))
-		{
-			$connection->exec("use {$config['database']};");
-		}
+        // We need to grab the PDO options that should be used while making the brand
+        // new connection instance. The PDO options control various aspects of the
+        // connection's behavior, and some might be specified by the developers.
+        $connection = $this->createConnection($dsn, $config, $options);
 
-		$collation = $config['collation'];
+        if (! empty($config['database'])) {
+            $connection->exec("use `{$config['database']}`;");
+        }
 
-		// Next we will set the "names" and "collation" on the clients connections so
-		// a correct character set will be used by this client. The collation also
-		// is set on the server but needs to be set here on this client objects.
-		$charset = $config['charset'];
+        $this->configureConnection($connection, $config);
 
-		$names = "set names '$charset'".
-			( ! is_null($collation) ? " collate '$collation'" : '');
+        return $connection;
+    }
 
-		$connection->prepare($names)->execute();
+    /**
+     * Create a DSN string from a configuration.
+     *
+     * Chooses socket or host/port based on the 'unix_socket' config value.
+     *
+     * @param  array  $config
+     * @return string
+     */
+    protected function getDsn(array $config)
+    {
+        return $this->hasSocket($config)
+                            ? $this->getSocketDsn($config)
+                            : $this->getHostDsn($config);
+    }
 
-		// If the "strict" option has been configured for the connection we'll enable
-		// strict mode on all of these tables. This enforces some extra rules when
-		// using the MySQL database system and is a quicker way to enforce them.
-		if (isset($config['strict']) && $config['strict'])
-		{
-			$connection->prepare("set session sql_mode='STRICT_ALL_TABLES'")->execute();
-		}
+    /**
+     * Determine if the given configuration array has a UNIX socket value.
+     *
+     * @param  array  $config
+     * @return bool
+     */
+    protected function hasSocket(array $config)
+    {
+        return isset($config['unix_socket']) && ! empty($config['unix_socket']);
+    }
 
-		return $connection;
-	}
+    /**
+     * Get the DSN string for a socket configuration.
+     *
+     * @param  array  $config
+     * @return string
+     */
+    protected function getSocketDsn(array $config)
+    {
+        return "mysql:unix_socket={$config['unix_socket']};dbname={$config['database']}";
+    }
 
-	/**
-	 * Create a DSN string from a configuration. Chooses socket or host/port based on
-	 * the 'unix_socket' config value
-	 *
-	 * @param  array   $config
-	 * @return string
-	 */
-	protected function getDsn(array $config)
-	{
-		return $this->configHasSocket($config) ? $this->getSocketDsn($config) : $this->getHostDsn($config);
-	}
+    /**
+     * Get the DSN string for a host / port configuration.
+     *
+     * @param  array  $config
+     * @return string
+     */
+    protected function getHostDsn(array $config)
+    {
+        extract($config, EXTR_SKIP);
 
-	/**
-	 * Determine if the given configuration array has a UNIX socket value.
-	 *
-	 * @param  array  $config
-	 * @return bool
-	 */
-	protected function configHasSocket(array $config)
-	{
-		return isset($config['unix_socket']) && ! empty($config['unix_socket']);
-	}
+        return isset($port)
+                    ? "mysql:host={$host};port={$port};dbname={$database}"
+                    : "mysql:host={$host};dbname={$database}";
+    }
 
-	/**
-	 * Get the DSN string for a socket configuration.
-	 *
-	 * @param  array  $config
-	 * @return string
-	 */
-	protected function getSocketDsn(array $config)
-	{
-		extract($config);
+    /**
+     * Configure the given PDO connection.
+     *
+     * @param  \PDO  $connection
+     * @param  array  $config
+     * @return void
+     */
+    protected function configureConnection(PDO $connection, array $config)
+    {
+        if (isset($config['isolation_level'])) {
+            $connection->exec(sprintf('SET SESSION TRANSACTION ISOLATION LEVEL %s;', $config['isolation_level']));
+        }
 
-		return "mysql:unix_socket={$config['unix_socket']};dbname={$database}";
-	}
+        $statements = [];
 
-	/**
-	 * Get the DSN string for a host / port configuration.
-	 *
-	 * @param  array  $config
-	 * @return string
-	 */
-	protected function getHostDsn(array $config)
-	{
-		extract($config);
+        if (isset($config['charset'])) {
+            if (isset($config['collation'])) {
+                $statements[] = sprintf("NAMES '%s' COLLATE '%s'", $config['charset'], $config['collation']);
+            } else {
+                $statements[] = sprintf("NAMES '%s'", $config['charset']);
+            }
+        }
 
-		return isset($config['port'])
-                        ? "mysql:host={$host};port={$port};dbname={$database}"
-                        : "mysql:host={$host};dbname={$database}";
-	}
+        if (isset($config['timezone'])) {
+            $statements[] = sprintf("time_zone='%s'", $config['timezone']);
+        }
 
+        $sqlMode = $this->getSqlMode($connection, $config);
+
+        if ($sqlMode !== null) {
+            $statements[] = sprintf("SESSION sql_mode='%s'", $sqlMode);
+        }
+
+        if ($statements !== []) {
+            $connection->exec(sprintf('SET %s;', implode(', ', $statements)));
+        }
+    }
+
+    /**
+     * Get the sql_mode value.
+     *
+     * @param  \PDO  $connection
+     * @param  array  $config
+     * @return string|null
+     */
+    protected function getSqlMode(PDO $connection, array $config)
+    {
+        if (isset($config['modes'])) {
+            return implode(',', $config['modes']);
+        }
+
+        if (! isset($config['strict'])) {
+            return null;
+        }
+
+        if (! $config['strict']) {
+            return 'NO_ENGINE_SUBSTITUTION';
+        }
+
+        $version = $config['version'] ?? $connection->getAttribute(PDO::ATTR_SERVER_VERSION);
+
+        if (version_compare($version, '8.0.11') >= 0) {
+            return 'ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION';
+        }
+
+        return 'ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION';
+    }
 }

@@ -1,226 +1,359 @@
-<?php namespace Illuminate\Support\Facades;
+<?php
 
+namespace Illuminate\Support\Facades;
+
+use Closure;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Arr;
+use Illuminate\Support\Js;
+use Illuminate\Support\Number;
+use Illuminate\Support\Str;
+use Illuminate\Support\Testing\Fakes\Fake;
 use Mockery;
+use Mockery\LegacyMockInterface;
 use RuntimeException;
-use Mockery\MockInterface;
 
-abstract class Facade {
+abstract class Facade
+{
+    /**
+     * The application instance being facaded.
+     *
+     * @var \Illuminate\Contracts\Foundation\Application|null
+     */
+    protected static $app;
 
-	/**
-	 * The application instance being facaded.
-	 *
-	 * @var \Illuminate\Foundation\Application
-	 */
-	protected static $app;
+    /**
+     * The resolved object instances.
+     *
+     * @var array
+     */
+    protected static $resolvedInstance;
 
-	/**
-	 * The resolved object instances.
-	 *
-	 * @var array
-	 */
-	protected static $resolvedInstance;
+    /**
+     * Indicates if the resolved instance should be cached.
+     *
+     * @var bool
+     */
+    protected static $cached = true;
 
-	/**
-	 * Hotswap the underlying instance behind the facade.
-	 *
-	 * @param  mixed  $instance
-	 * @return void
-	 */
-	public static function swap($instance)
-	{
-		static::$resolvedInstance[static::getFacadeAccessor()] = $instance;
+    /**
+     * Run a Closure when the facade has been resolved.
+     *
+     * @param  \Closure  $callback
+     * @return void
+     */
+    public static function resolved(Closure $callback)
+    {
+        $accessor = static::getFacadeAccessor();
 
-		static::$app->instance(static::getFacadeAccessor(), $instance);
-	}
+        if (static::$app->resolved($accessor) === true) {
+            $callback(static::getFacadeRoot(), static::$app);
+        }
 
-	/**
-	 * Initiate a mock expectation on the facade.
-	 *
-	 * @param  mixed
-	 * @return \Mockery\Expectation
-	 */
-	public static function shouldReceive()
-	{
-		$name = static::getFacadeAccessor();
+        static::$app->afterResolving($accessor, function ($service, $app) use ($callback) {
+            $callback($service, $app);
+        });
+    }
 
-		if (static::isMock())
-		{
-			$mock = static::$resolvedInstance[$name];
-		}
-		else
-		{
-			$mock = static::createFreshMockInstance($name);
-		}
+    /**
+     * Convert the facade into a Mockery spy.
+     *
+     * @return \Mockery\MockInterface
+     */
+    public static function spy()
+    {
+        if (! static::isMock()) {
+            $class = static::getMockableClass();
 
-		return call_user_func_array(array($mock, 'shouldReceive'), func_get_args());
-	}
+            return tap($class ? Mockery::spy($class) : Mockery::spy(), function ($spy) {
+                static::swap($spy);
+            });
+        }
+    }
 
-	/**
-	 * Create a fresh mock instance for the given class.
-	 *
-	 * @param  string  $name
-	 * @return \Mockery\Expectation
-	 */
-	protected static function createFreshMockInstance($name)
-	{
-		static::$resolvedInstance[$name] = $mock = static::createMockByName($name);
+    /**
+     * Initiate a partial mock on the facade.
+     *
+     * @return \Mockery\MockInterface
+     */
+    public static function partialMock()
+    {
+        $name = static::getFacadeAccessor();
 
-		if (isset(static::$app))
-		{
-			static::$app->instance($name, $mock);
-		}
+        $mock = static::isMock()
+            ? static::$resolvedInstance[$name]
+            : static::createFreshMockInstance();
 
-		return $mock;
-	}
+        return $mock->makePartial();
+    }
 
-	/**
-	 * Create a fresh mock instance for the given class.
-	 *
-	 * @param  string  $name
-	 * @return \Mockery\Expectation
-	 */
-	protected static function createMockByName($name)
-	{
-		$class = static::getMockableClass($name);
+    /**
+     * Initiate a mock expectation on the facade.
+     *
+     * @return \Mockery\Expectation
+     */
+    public static function shouldReceive()
+    {
+        $name = static::getFacadeAccessor();
 
-		return $class ? Mockery::mock($class) : Mockery::mock();
-	}
+        $mock = static::isMock()
+            ? static::$resolvedInstance[$name]
+            : static::createFreshMockInstance();
 
-	/**
-	 * Determines whether a mock is set as the instance of the facade.
-	 *
-	 * @return bool
-	 */
-	protected static function isMock()
-	{
-		$name = static::getFacadeAccessor();
+        return $mock->shouldReceive(...func_get_args());
+    }
 
-		return isset(static::$resolvedInstance[$name]) && static::$resolvedInstance[$name] instanceof MockInterface;
-	}
+    /**
+     * Initiate a mock expectation on the facade.
+     *
+     * @return \Mockery\Expectation
+     */
+    public static function expects()
+    {
+        $name = static::getFacadeAccessor();
 
-	/**
-	 * Get the mockable class for the bound instance.
-	 *
-	 * @return string
-	 */
-	protected static function getMockableClass()
-	{
-		if ($root = static::getFacadeRoot()) return get_class($root);
-	}
+        $mock = static::isMock()
+            ? static::$resolvedInstance[$name]
+            : static::createFreshMockInstance();
 
-	/**
-	 * Get the root object behind the facade.
-	 *
-	 * @return mixed
-	 */
-	public static function getFacadeRoot()
-	{
-		return static::resolveFacadeInstance(static::getFacadeAccessor());
-	}
+        return $mock->expects(...func_get_args());
+    }
 
-	/**
-	 * Get the registered name of the component.
-	 *
-	 * @return string
-	 *
-	 * @throws \RuntimeException
-	 */
-	protected static function getFacadeAccessor()
-	{
-		throw new RuntimeException("Facade does not implement getFacadeAccessor method.");
-	}
+    /**
+     * Create a fresh mock instance for the given class.
+     *
+     * @return \Mockery\MockInterface
+     */
+    protected static function createFreshMockInstance()
+    {
+        return tap(static::createMock(), function ($mock) {
+            static::swap($mock);
 
-	/**
-	 * Resolve the facade root instance from the container.
-	 *
-	 * @param  string  $name
-	 * @return mixed
-	 */
-	protected static function resolveFacadeInstance($name)
-	{
-		if (is_object($name)) return $name;
+            $mock->shouldAllowMockingProtectedMethods();
+        });
+    }
 
-		if (isset(static::$resolvedInstance[$name]))
-		{
-			return static::$resolvedInstance[$name];
-		}
+    /**
+     * Create a fresh mock instance for the given class.
+     *
+     * @return \Mockery\MockInterface
+     */
+    protected static function createMock()
+    {
+        $class = static::getMockableClass();
 
-		return static::$resolvedInstance[$name] = static::$app[$name];
-	}
+        return $class ? Mockery::mock($class) : Mockery::mock();
+    }
 
-	/**
-	 * Clear a resolved facade instance.
-	 *
-	 * @param  string  $name
-	 * @return void
-	 */
-	public static function clearResolvedInstance($name)
-	{
-		unset(static::$resolvedInstance[$name]);
-	}
+    /**
+     * Determines whether a mock is set as the instance of the facade.
+     *
+     * @return bool
+     */
+    protected static function isMock()
+    {
+        $name = static::getFacadeAccessor();
 
-	/**
-	 * Clear all of the resolved instances.
-	 *
-	 * @return void
-	 */
-	public static function clearResolvedInstances()
-	{
-		static::$resolvedInstance = array();
-	}
+        return isset(static::$resolvedInstance[$name]) &&
+               static::$resolvedInstance[$name] instanceof LegacyMockInterface;
+    }
 
-	/**
-	 * Get the application instance behind the facade.
-	 *
-	 * @return \Illuminate\Foundation\Application
-	 */
-	public static function getFacadeApplication()
-	{
-		return static::$app;
-	}
+    /**
+     * Get the mockable class for the bound instance.
+     *
+     * @return string|null
+     */
+    protected static function getMockableClass()
+    {
+        if ($root = static::getFacadeRoot()) {
+            return get_class($root);
+        }
+    }
 
-	/**
-	 * Set the application instance.
-	 *
-	 * @param  \Illuminate\Foundation\Application  $app
-	 * @return void
-	 */
-	public static function setFacadeApplication($app)
-	{
-		static::$app = $app;
-	}
+    /**
+     * Hotswap the underlying instance behind the facade.
+     *
+     * @param  mixed  $instance
+     * @return void
+     */
+    public static function swap($instance)
+    {
+        static::$resolvedInstance[static::getFacadeAccessor()] = $instance;
 
-	/**
-	 * Handle dynamic, static calls to the object.
-	 *
-	 * @param  string  $method
-	 * @param  array   $args
-	 * @return mixed
-	 */
-	public static function __callStatic($method, $args)
-	{
-		$instance = static::getFacadeRoot();
+        if (isset(static::$app)) {
+            static::$app->instance(static::getFacadeAccessor(), $instance);
+        }
+    }
 
-		switch (count($args))
-		{
-			case 0:
-				return $instance->$method();
+    /**
+     * Determines whether a "fake" has been set as the facade instance.
+     *
+     * @return bool
+     */
+    protected static function isFake()
+    {
+        $name = static::getFacadeAccessor();
 
-			case 1:
-				return $instance->$method($args[0]);
+        return isset(static::$resolvedInstance[$name]) &&
+               static::$resolvedInstance[$name] instanceof Fake;
+    }
 
-			case 2:
-				return $instance->$method($args[0], $args[1]);
+    /**
+     * Get the root object behind the facade.
+     *
+     * @return mixed
+     */
+    public static function getFacadeRoot()
+    {
+        return static::resolveFacadeInstance(static::getFacadeAccessor());
+    }
 
-			case 3:
-				return $instance->$method($args[0], $args[1], $args[2]);
+    /**
+     * Get the registered name of the component.
+     *
+     * @return string
+     *
+     * @throws \RuntimeException
+     */
+    protected static function getFacadeAccessor()
+    {
+        throw new RuntimeException('Facade does not implement getFacadeAccessor method.');
+    }
 
-			case 4:
-				return $instance->$method($args[0], $args[1], $args[2], $args[3]);
+    /**
+     * Resolve the facade root instance from the container.
+     *
+     * @param  string  $name
+     * @return mixed
+     */
+    protected static function resolveFacadeInstance($name)
+    {
+        if (isset(static::$resolvedInstance[$name])) {
+            return static::$resolvedInstance[$name];
+        }
 
-			default:
-				return call_user_func_array(array($instance, $method), $args);
-		}
-	}
+        if (static::$app) {
+            if (static::$cached) {
+                return static::$resolvedInstance[$name] = static::$app[$name];
+            }
 
+            return static::$app[$name];
+        }
+    }
+
+    /**
+     * Clear a resolved facade instance.
+     *
+     * @param  string  $name
+     * @return void
+     */
+    public static function clearResolvedInstance($name)
+    {
+        unset(static::$resolvedInstance[$name]);
+    }
+
+    /**
+     * Clear all of the resolved instances.
+     *
+     * @return void
+     */
+    public static function clearResolvedInstances()
+    {
+        static::$resolvedInstance = [];
+    }
+
+    /**
+     * Get the application default aliases.
+     *
+     * @return \Illuminate\Support\Collection
+     */
+    public static function defaultAliases()
+    {
+        return collect([
+            'App' => App::class,
+            'Arr' => Arr::class,
+            'Artisan' => Artisan::class,
+            'Auth' => Auth::class,
+            'Blade' => Blade::class,
+            'Broadcast' => Broadcast::class,
+            'Bus' => Bus::class,
+            'Cache' => Cache::class,
+            'Config' => Config::class,
+            'Context' => Context::class,
+            'Cookie' => Cookie::class,
+            'Crypt' => Crypt::class,
+            'Date' => Date::class,
+            'DB' => DB::class,
+            'Eloquent' => Model::class,
+            'Event' => Event::class,
+            'File' => File::class,
+            'Gate' => Gate::class,
+            'Hash' => Hash::class,
+            'Http' => Http::class,
+            'Js' => Js::class,
+            'Lang' => Lang::class,
+            'Log' => Log::class,
+            'Mail' => Mail::class,
+            'Notification' => Notification::class,
+            'Number' => Number::class,
+            'Password' => Password::class,
+            'Process' => Process::class,
+            'Queue' => Queue::class,
+            'RateLimiter' => RateLimiter::class,
+            'Redirect' => Redirect::class,
+            'Request' => Request::class,
+            'Response' => Response::class,
+            'Route' => Route::class,
+            'Schedule' => Schedule::class,
+            'Schema' => Schema::class,
+            'Session' => Session::class,
+            'Storage' => Storage::class,
+            'Str' => Str::class,
+            'URL' => URL::class,
+            'Validator' => Validator::class,
+            'View' => View::class,
+            'Vite' => Vite::class,
+        ]);
+    }
+
+    /**
+     * Get the application instance behind the facade.
+     *
+     * @return \Illuminate\Contracts\Foundation\Application|null
+     */
+    public static function getFacadeApplication()
+    {
+        return static::$app;
+    }
+
+    /**
+     * Set the application instance.
+     *
+     * @param  \Illuminate\Contracts\Foundation\Application|null  $app
+     * @return void
+     */
+    public static function setFacadeApplication($app)
+    {
+        static::$app = $app;
+    }
+
+    /**
+     * Handle dynamic, static calls to the object.
+     *
+     * @param  string  $method
+     * @param  array  $args
+     * @return mixed
+     *
+     * @throws \RuntimeException
+     */
+    public static function __callStatic($method, $args)
+    {
+        $instance = static::getFacadeRoot();
+
+        if (! $instance) {
+            throw new RuntimeException('A facade root has not been set.');
+        }
+
+        return $instance->$method(...$args);
+    }
 }

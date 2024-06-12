@@ -1,15 +1,19 @@
-<?php namespace App\Http\Controllers;
+<?php
+
+namespace App\Http\Controllers;
 
 use App\UserFeedback;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Input;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Redirect;
 
-class EnquiryController extends Controller {
+class EnquiryController extends Controller
+{
     public function index()
     {
-        $data = Input::all();
+        $request = new Request();
+        $data = $request->all();
         $rules = array(
             'name' => 'required',
             'email' => 'required|email',
@@ -18,15 +22,15 @@ class EnquiryController extends Controller {
             'g-recaptcha-response' => 'required|captcha',
         );
         $validator = Validator::make($data, $rules);
-        if ($validator->fails()){
+        if ($validator->fails()) {
             return Redirect::to('/contact')->withInput()->withErrors($validator);
-        }
-        else{
+        } else {
+            $request = new Request();
             $userfeedback = new UserFeedback;
-            $userfeedback->UserName = Input::get('name');
-            $userfeedback->UserEmail = Input::get('email');
-            $userfeedback->UserFeedbackCategory = Input::get('subject');
-            $userfeedback->UserFeedback = Input::get('message');
+            $userfeedback->UserName = $request->get('name');
+            $userfeedback->UserEmail = $request->get('email');
+            $userfeedback->UserFeedbackCategory = $request->get('subject');
+            $userfeedback->UserFeedback = $request->get('message');
             $userfeedback->save();
             return redirect()->back()->with('success', [1]);
         }

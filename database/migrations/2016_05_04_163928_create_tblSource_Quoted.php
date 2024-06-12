@@ -1,16 +1,17 @@
 <?php
 
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Support\Facades\DB;
 
 class CreateTblSourceQuoted extends Migration {
 
-	/**
-	 * Run the migrations.
-	 *
-	 * @return void
-	 */
+    /**
+     * Run the migrations.
+     *
+     * @return void
+     */
     public function up()
     {
         Schema::create('tblSource_Quoted', function(Blueprint $table) {
@@ -23,7 +24,6 @@ class CreateTblSourceQuoted extends Migration {
             $table->string('Source_Explanation')->nullable();
             $table->integer('StatusTypeId')->unsigned();
             $table->timestamp('EntryDate')->default(DB::raw('CURRENT_TIMESTAMP'));
-
             $table->foreign('SourceId')->references('SourceId')->on('tblSource');
             $table->foreign('StatusTypeId')->references('StatusTypeId')->on('tblStatusType');
         });

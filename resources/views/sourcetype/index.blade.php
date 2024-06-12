@@ -2,7 +2,7 @@
 
 @section('content')
 
-    <table id="tblSource_Type"></table>
+    <table id="tblSource_Type"><th></th></table>
     <div id="jqGridPager"></div>
 
     <script type="text/javascript">
@@ -136,4 +136,3 @@
 
     </script>
 @endsection
-

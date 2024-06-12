@@ -26,35 +26,35 @@
                         {!! Form::open(array('url'=>'contact','method'=>'POST', 'id'=>'myform')) !!}
 
                         <div class="form-group">
-                            <label class="col-md-4 control-label">Name</label>
+                            <label for="name" class="col-md-4 control-label">Name</label>
                             <div class="col-md-6">
                                 {!! Form::text('name','',array('id'=>'','class'=>'form-control span6','placeholder' => 'Your Name')) !!}
                             </div>
                         </div>
 
                         <div class="form-group">
-                            <label class="col-md-4 control-label">E-Mail Address</label>
+                            <label for="email" class="col-md-4 control-label">E-Mail Address</label>
                             <div class="col-md-6">
                                 {!! Form::text('email','',array('id'=>'','class'=>'form-control span6','placeholder' => 'Your Email')) !!}
                             </div>
                         </div>
 
                         <div class="form-group">
-                            <label class="col-md-4 control-label">Subject</label>
+                            <label for="subject" class="col-md-4 control-label">Subject</label>
                             <div class="col-md-6">
                                 {!! Form::select('subject', array('' => 'Select Subject', 'Receive blog' => 'Receive blog', 'Technical Issue' => 'Technical Issue', 'Comment' => 'Comment', 'Question' => 'Question'), null, ['id' => 'subject', 'class'=>'form-control span6', 'placeholder' => 'choose']) !!}
                             </div>
                         </div>
 
                         <div class="form-group">
-                            <label class="col-md-4 control-label">Message</label>
+                            <label for="message" class="col-md-4 control-label">Message</label>
                             <div class="col-md-6">
                                 {!! Form::textarea('message','',array('id'=>'','class'=>'form-control span6','placeholder' => 'Your Message')) !!}
                             </div>
                         </div>
 
                         <div class="form-group">
-                            <label class="col-md-4 control-label"></label>
+                            <label for="captcha" class="col-md-4 control-label">Captcha</label>
                             <div class="col-md-6">
                                 {!! app('captcha')->display() !!}
                             </div>

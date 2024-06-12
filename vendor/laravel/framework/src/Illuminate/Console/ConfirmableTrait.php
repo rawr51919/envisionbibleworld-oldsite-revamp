@@ -1,50 +1,54 @@
-<?php namespace Illuminate\Console;
+<?php
 
-use Closure;
+namespace Illuminate\Console;
 
-trait ConfirmableTrait {
+use function Laravel\Prompts\confirm;
 
-	/**
-	 * Confirm before proceeding with the action
-	 *
-	 * @param  string    $warning
-	 * @param  \Closure|null  $callback
-	 * @return bool
-	 */
-	public function confirmToProceed($warning = 'Application In Production!', Closure $callback = null)
-	{
-		$shouldConfirm = $callback ?: $this->getDefaultConfirmCallback();
+trait ConfirmableTrait
+{
+    /**
+     * Confirm before proceeding with the action.
+     *
+     * This method only asks for confirmation in production.
+     *
+     * @param  string  $warning
+     * @param  \Closure|bool|null  $callback
+     * @return bool
+     */
+    public function confirmToProceed($warning = 'Application In Production', $callback = null)
+    {
+        $callback = is_null($callback) ? $this->getDefaultConfirmCallback() : $callback;
 
-		if (call_user_func($shouldConfirm))
-		{
-			if ($this->option('force')) return true;
+        $shouldConfirm = value($callback);
 
-			$this->comment(str_repeat('*', strlen($warning) + 12));
-			$this->comment('*     '.$warning.'     *');
-			$this->comment(str_repeat('*', strlen($warning) + 12));
-			$this->output->writeln('');
+        if ($shouldConfirm) {
+            if ($this->hasOption('force') && $this->option('force')) {
+                return true;
+            }
 
-			$confirmed = $this->confirm('Do you really wish to run this command? [y/N]');
+            $this->components->alert($warning);
 
-			if ( ! $confirmed)
-			{
-				$this->comment('Command Cancelled!');
+            $confirmed = confirm('Are you sure you want to run this command?', default: false);
 
-				return false;
-			}
-		}
+            if (! $confirmed) {
+                $this->components->warn('Command cancelled.');
 
-		return true;
-	}
+                return false;
+            }
+        }
 
-	/**
-	 * Get the default confirmation callback.
-	 *
-	 * @return \Closure
-	 */
-	protected function getDefaultConfirmCallback()
-	{
-		return function() { return $this->getLaravel()->environment() == 'production'; };
-	}
+        return true;
+    }
 
+    /**
+     * Get the default confirmation callback.
+     *
+     * @return \Closure
+     */
+    protected function getDefaultConfirmCallback()
+    {
+        return function () {
+            return $this->getLaravel()->environment() === 'production';
+        };
+    }
 }

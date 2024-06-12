@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Http\Controllers;
 
 use App\Http\Requests;
@@ -7,7 +8,8 @@ use App\Http\Controllers\Controller;
 use App\SourceType;
 use Illuminate\Http\Request;
 
-class SourceTypeController extends Controller {
+class SourceTypeController extends Controller
+{
 
     public function __construct()
     {
@@ -23,7 +25,8 @@ class SourceTypeController extends Controller {
         return view('sourcetype.index');
     }
 
-    public function getSourceTypes() {
+    public function getSourceTypes()
+    {
 
         $page = $_GET['page'];
         $limit = $_GET['rows'];
@@ -32,7 +35,7 @@ class SourceTypeController extends Controller {
 
         $count = SourceType::all()->count();
         if ($count > 0 && $limit > 0) {
-            $total_pages = ceil($count/$limit);
+            $total_pages = ceil($count / $limit);
         } else {
             $total_pages = 0;
         }
@@ -51,48 +54,47 @@ class SourceTypeController extends Controller {
             ->orderBy($sidx, $sord)
             ->get();
 
-        $res = array('page'=>$page,'total'=>$total_pages, 'records'=>$count, 'rows'=>$sourceTypes);
+        $res = array('page' => $page, 'total' => $total_pages, 'records' => $count, 'rows' => $sourceTypes);
         return response()->json($res);
     }
 
-    public function postUpdateSourceType(Request $request) {
+    public function postUpdateSourceType(Request $request)
+    {
         //Get Category ID and changing data
         $id = $request->Source_TypeId;
         $sourceType = $request->Source_Type;
         $sourceTypeAbbreviation = $request->Source_Type_Abbreviation;
 
-        try{
-            if(is_numeric($id)) {
+        try {
+            if (is_numeric($id)) {
                 $obj = SourceType::find($id);
                 $obj->Source_Type = $sourceType;
                 $obj->Source_Type_Abbreviation = $sourceTypeAbbreviation;
                 $obj->save();
-            }else{
+            } else {
                 $obj = new SourceType;
                 $obj->Source_Type = $sourceType;
                 $obj->Source_Type_Abbreviation = $sourceTypeAbbreviation;
                 $obj->save();
             }
-
         } catch (\Exception $e) {
-            return response()->json(array('result'=>false, 'msg'=>'Save failed!!'));
+            return response()->json(array('result' => false, 'msg' => 'Save failed!!'));
         }
-        return response()->json(array('result'=>true, 'msg'=>'Successfully saved!!'));
+        return response()->json(array('result' => true, 'msg' => 'Successfully saved!!'));
     }
 
-    public function postDeleteSourceType(Request $request) {
+    public function postDeleteSourceType(Request $request)
+    {
         //Get Category ID and changing data
         $id = $request->Source_TypeId;
-        try{
+        try {
 
             $obj = SourceType::find($id);
             $obj->delete();
-
         } catch (\Exception $e) {
-            return response()->json(array('result'=>false, 'msg'=>'Deleted failed!!'));
+            return response()->json(array('result' => false, 'msg' => 'Deleted failed!!'));
         }
 
-        return response()->json(array('result'=>true, 'msg'=>'Successfully Deleted!!'));
+        return response()->json(array('result' => true, 'msg' => 'Successfully Deleted!!'));
     }
-
 }

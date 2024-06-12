@@ -1,16 +1,17 @@
 <?php
 
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Support\Facades\DB;
 
 class CreateTblSummaryDetails extends Migration {
 
-	/**
-	 * Run the migrations.
-	 *
-	 * @return void
-	 */
+    /**
+     * Run the migrations.
+     *
+     * @return void
+     */
     public function up()
     {
         Schema::create('tblSummary_Details', function(Blueprint $table) {
@@ -24,13 +25,12 @@ class CreateTblSummaryDetails extends Migration {
             $table->integer('EraId')->unsigned();
             $table->integer('SubcategoryId')->unsigned();
             $table->timestamp('EntryDate')->default(DB::raw('CURRENT_TIMESTAMP'));
-
             $table->foreign('StatusTypeId')->references('StatusTypeId')->on('tblStatusType');
-            //$table->foreign('SacrificeId')->references('SacrificeId')->on('tblSacrifice');
+            $table->foreign('SacrificeId')->references('SacrificeId')->on('tblSacrifice');
             $table->foreign('SummaryId')->references('SummaryId')->on('tblSummary');
-            //$table->foreign('Source_QuotedId')->references('Source_QuotedId')->on('tblSource_Quoted');
+            $table->foreign('Source_QuotedId')->references('Source_QuotedId')->on('tblSource_Quoted');
             $table->foreign('QuotationId')->references('QuotationId')->on('tblQuotation');
-            //$table->foreign('LocationId')->references('LocationId')->on('tblLocation');
+            $table->foreign('LocationId')->references('LocationId')->on('tblLocation');
             $table->foreign('EraId')->references('EraId')->on('tblEra');
             $table->foreign('SubcategoryId')->references('SubcategoryId')->on('tblSubCategory');
         });

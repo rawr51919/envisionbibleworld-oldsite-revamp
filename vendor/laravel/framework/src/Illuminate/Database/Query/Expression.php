@@ -1,43 +1,38 @@
-<?php namespace Illuminate\Database\Query;
+<?php
 
-class Expression {
+namespace Illuminate\Database\Query;
 
-	/**
-	 * The value of the expression.
-	 *
-	 * @var mixed
-	 */
-	protected $value;
+use Illuminate\Contracts\Database\Query\Expression as ExpressionContract;
+use Illuminate\Database\Grammar;
 
-	/**
-	 * Create a new raw query expression.
-	 *
-	 * @param  mixed  $value
-	 * @return void
-	 */
-	public function __construct($value)
-	{
-		$this->value = $value;
-	}
+class Expression implements ExpressionContract
+{
+    /**
+     * The value of the expression.
+     *
+     * @var string|int|float
+     */
+    protected $value;
 
-	/**
-	 * Get the value of the expression.
-	 *
-	 * @return mixed
-	 */
-	public function getValue()
-	{
-		return $this->value;
-	}
+    /**
+     * Create a new raw query expression.
+     *
+     * @param  string|int|float  $value
+     * @return void
+     */
+    public function __construct($value)
+    {
+        $this->value = $value;
+    }
 
-	/**
-	 * Get the value of the expression.
-	 *
-	 * @return string
-	 */
-	public function __toString()
-	{
-		return (string) $this->getValue();
-	}
-
+    /**
+     * Get the value of the expression.
+     *
+     * @param  \Illuminate\Database\Grammar  $grammar
+     * @return string|int|float
+     */
+    public function getValue(Grammar $grammar)
+    {
+        return $this->value;
+    }
 }

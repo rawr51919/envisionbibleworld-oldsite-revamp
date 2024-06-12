@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Http\Controllers;
 
 use App\Http\Requests;
@@ -6,7 +7,8 @@ use App\Http\Controllers\Controller;
 
 use Illuminate\Http\Request;
 
-class ScreenShotController extends Controller {
+class ScreenShotController extends Controller
+{
 
     /**
      * Display a listing of the resource.
@@ -81,5 +83,4 @@ class ScreenShotController extends Controller {
     {
         //
     }
-
 }

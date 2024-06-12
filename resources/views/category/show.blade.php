@@ -2,7 +2,7 @@
 
 @section('content')
 
-    <table id="tblSubcategory"></table>
+    <table id="tblSubcategory"><th></th></table>
     <div id="jqGridPager"></div>
 
     <script type="text/javascript">

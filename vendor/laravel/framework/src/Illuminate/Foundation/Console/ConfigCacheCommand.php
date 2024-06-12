@@ -1,93 +1,94 @@
-<?php namespace Illuminate\Foundation\Console;
+<?php
+
+namespace Illuminate\Foundation\Console;
 
 use Illuminate\Console\Command;
+use Illuminate\Contracts\Console\Kernel as ConsoleKernelContract;
 use Illuminate\Filesystem\Filesystem;
+use LogicException;
+use Symfony\Component\Console\Attribute\AsCommand;
+use Throwable;
 
-class ConfigCacheCommand extends Command {
+#[AsCommand(name: 'config:cache')]
+class ConfigCacheCommand extends Command
+{
+    /**
+     * The console command name.
+     *
+     * @var string
+     */
+    protected $name = 'config:cache';
 
-	/**
-	 * The console command name.
-	 *
-	 * @var string
-	 */
-	protected $name = 'config:cache';
+    /**
+     * The console command description.
+     *
+     * @var string
+     */
+    protected $description = 'Create a cache file for faster configuration loading';
 
-	/**
-	 * The console command description.
-	 *
-	 * @var string
-	 */
-	protected $description = 'Create a cache file for faster configuration loading';
+    /**
+     * The filesystem instance.
+     *
+     * @var \Illuminate\Filesystem\Filesystem
+     */
+    protected $files;
 
-	/**
-	 * The filesystem instance.
-	 *
-	 * @var \Illuminate\Filesystem\Filesystem
-	 */
-	protected $files;
+    /**
+     * Create a new config cache command instance.
+     *
+     * @param  \Illuminate\Filesystem\Filesystem  $files
+     * @return void
+     */
+    public function __construct(Filesystem $files)
+    {
+        parent::__construct();
 
-	/**
-	 * Create a new config cache command instance.
-	 *
-	 * @param  \Illuminate\Filesystem\Filesystem  $files
-	 * @return void
-	 */
-	public function __construct(Filesystem $files)
-	{
-		parent::__construct();
+        $this->files = $files;
+    }
 
-		$this->files = $files;
-	}
+    /**
+     * Execute the console command.
+     *
+     * @return void
+     *
+     * @throws \LogicException
+     */
+    public function handle()
+    {
+        $this->callSilent('config:clear');
 
-	/**
-	 * Execute the console command.
-	 *
-	 * @return void
-	 */
-	public function fire()
-	{
-		$this->call('config:clear');
+        $config = $this->getFreshConfiguration();
 
-		$config = $this->setRealSessionDriver(
-			$this->getFreshConfiguration()
-		);
+        $configPath = $this->laravel->getCachedConfigPath();
 
-		$this->files->put(
-			$this->laravel->getCachedConfigPath(), '<?php return '.var_export($config, true).';'.PHP_EOL
-		);
+        $this->files->put(
+            $configPath, '<?php return '.var_export($config, true).';'.PHP_EOL
+        );
 
-		$this->info('Configuration cached successfully!');
-	}
+        try {
+            require $configPath;
+        } catch (Throwable $e) {
+            $this->files->delete($configPath);
 
-	/**
-	 * Boot a fresh copy of the application configuration.
-	 *
-	 * @return \Illuminate\Routing\RouteCollection
-	 */
-	protected function getFreshConfiguration()
-	{
-		$app = require $this->laravel['path.base'].'/bootstrap/app.php';
+            throw new LogicException('Your configuration files are not serializable.', 0, $e);
+        }
 
-		$app->make('Illuminate\Contracts\Console\Kernel')->bootstrap();
+        $this->components->info('Configuration cached successfully.');
+    }
 
-		return $app['config']->all();
-	}
+    /**
+     * Boot a fresh copy of the application configuration.
+     *
+     * @return array
+     */
+    protected function getFreshConfiguration()
+    {
+        $app = require $this->laravel->bootstrapPath('app.php');
 
-	/**
-	 * Set the "real" session driver on the configuratoin array.
-	 *
-	 * Typically the SessionManager forces the driver to "array" in CLI environment.
-	 *
-	 * @param  array  $config
-	 * @return array
-	 */
-	protected function setRealSessionDriver(array $config)
-	{
-		$session = require $this->laravel->configPath().'/session.php';
+        $app->useStoragePath($this->laravel->storagePath());
 
-		$config['session']['driver'] = $session['driver'];
+        $app->make(ConsoleKernelContract::class)->bootstrap();
 
-		return $config;
-	}
-
+        return $app['config']->all();
+    }
 }

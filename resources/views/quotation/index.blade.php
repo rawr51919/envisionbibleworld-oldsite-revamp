@@ -47,15 +47,15 @@
 
 @section('content')
 
-    <table id="tblQuotation"></table>
+    <table id="tblQuotation"><th></th></table>
     <div id="jqGridPager"></div>
 
     <script type="text/javascript">
 
         var statusTypes;
         $(document).ready(function () {
-//            if (!window.console) window.console = {};
-//            if (!window.console.log) window.console.log = function () { };
+           if (!window.console) window.console = {};
+           if (!window.console.log) window.console.log = function(){};
             //load status types
             loadStatusTypes();
 
@@ -163,12 +163,6 @@
                 lastSelection = null;
             }
 
-//            function funcAfterSave() {
-//                alert('here');
-//                myGrid.trigger('reloadGrid');
-//                lastSelection = null;
-//            }
-
             function funcOnChangeStatusType(obj) {
                 var rowId = myGrid.jqGrid ('getGridParam', 'selrow');
                 myGrid.jqGrid("setCell", rowId, "StatusTypeId", obj.value);
@@ -187,5 +181,3 @@
         }
     </script>
 @endsection
-
-

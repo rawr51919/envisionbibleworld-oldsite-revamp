@@ -1,391 +1,296 @@
-<?php namespace Illuminate\Bus;
+<?php
+
+namespace Illuminate\Bus;
 
 use Closure;
-use ArrayAccess;
-use ReflectionClass;
-use ReflectionParameter;
-use Illuminate\Pipeline\Pipeline;
-use Illuminate\Support\Collection;
-use Illuminate\Contracts\Queue\Queue;
-use Illuminate\Contracts\Bus\SelfHandling;
-use Illuminate\Contracts\Container\Container;
-use Illuminate\Contracts\Bus\HandlerResolver;
-use Illuminate\Contracts\Queue\ShouldBeQueued;
 use Illuminate\Contracts\Bus\QueueingDispatcher;
-use Illuminate\Contracts\Bus\Dispatcher as DispatcherContract;
+use Illuminate\Contracts\Container\Container;
+use Illuminate\Contracts\Queue\Queue;
+use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Foundation\Bus\PendingChain;
+use Illuminate\Pipeline\Pipeline;
+use Illuminate\Queue\InteractsWithQueue;
+use Illuminate\Queue\Jobs\SyncJob;
+use Illuminate\Support\Collection;
+use RuntimeException;
 
-class Dispatcher implements DispatcherContract, QueueingDispatcher, HandlerResolver {
+class Dispatcher implements QueueingDispatcher
+{
+    /**
+     * The container implementation.
+     *
+     * @var \Illuminate\Contracts\Container\Container
+     */
+    protected $container;
 
-	/**
-	 * The container implementation.
-	 *
-	 * @var \Illuminate\Contracts\Container\Container
-	 */
-	protected $container;
+    /**
+     * The pipeline instance for the bus.
+     *
+     * @var \Illuminate\Pipeline\Pipeline
+     */
+    protected $pipeline;
 
-	/**
-	 * The pipeline instance for the bus.
-	 *
-	 * @var \Illuminate\Pipeline\Pipeline
-	 */
-	protected $pipeline;
+    /**
+     * The pipes to send commands through before dispatching.
+     *
+     * @var array
+     */
+    protected $pipes = [];
 
-	/**
-	 * The pipes to send commands through before dispatching.
-	 *
-	 * @var array
-	 */
-	protected $pipes = [];
+    /**
+     * The command to handler mapping for non-self-handling events.
+     *
+     * @var array
+     */
+    protected $handlers = [];
 
-	/**
-	 * The queue resolver callback.
-	 *
-	 * @var \Closure|null
-	 */
-	protected $queueResolver;
+    /**
+     * The queue resolver callback.
+     *
+     * @var \Closure|null
+     */
+    protected $queueResolver;
 
-	/**
-	 * All of the command to handler mappings.
-	 *
-	 * @var array
-	 */
-	protected $mappings = [];
+    /**
+     * Create a new command dispatcher instance.
+     *
+     * @param  \Illuminate\Contracts\Container\Container  $container
+     * @param  \Closure|null  $queueResolver
+     * @return void
+     */
+    public function __construct(Container $container, ?Closure $queueResolver = null)
+    {
+        $this->container = $container;
+        $this->queueResolver = $queueResolver;
+        $this->pipeline = new Pipeline($container);
+    }
 
-	/**
-	 * The fallback mapping Closure.
-	 *
-	 * @var \Closure
-	 */
-	protected $mapper;
+    /**
+     * Dispatch a command to its appropriate handler.
+     *
+     * @param  mixed  $command
+     * @return mixed
+     */
+    public function dispatch($command)
+    {
+        return $this->queueResolver && $this->commandShouldBeQueued($command)
+                        ? $this->dispatchToQueue($command)
+                        : $this->dispatchNow($command);
+    }
 
-	/**
-	 * Create a new command dispatcher instance.
-	 *
-	 * @param  \Illuminate\Contracts\Container\Container  $container
-	 * @param  \Closure|null $queueResolver
-	 * @return void
-	 */
-	public function __construct(Container $container, Closure $queueResolver = null)
-	{
-		$this->container = $container;
-		$this->queueResolver = $queueResolver;
-		$this->pipeline = new Pipeline($container);
-	}
+    /**
+     * Dispatch a command to its appropriate handler in the current process.
+     *
+     * Queueable jobs will be dispatched to the "sync" queue.
+     *
+     * @param  mixed  $command
+     * @param  mixed  $handler
+     * @return mixed
+     */
+    public function dispatchSync($command, $handler = null)
+    {
+        if ($this->queueResolver &&
+            $this->commandShouldBeQueued($command) &&
+            method_exists($command, 'onConnection')) {
+            return $this->dispatchToQueue($command->onConnection('sync'));
+        }
 
-	/**
-	 * Marshal a command and dispatch it to its appropriate handler.
-	 *
-	 * @param  mixed  $command
-	 * @param  array  $array
-	 * @return mixed
-	 */
-	public function dispatchFromArray($command, array $array)
-	{
-		return $this->dispatch($this->marshalFromArray($command, $array));
-	}
+        return $this->dispatchNow($command, $handler);
+    }
 
-	/**
-	 * Marshal a command and dispatch it to its appropriate handler.
-	 *
-	 * @param  mixed  $command
-	 * @param  \ArrayAccess  $source
-	 * @param  array  $extras
-	 * @return mixed
-	 */
-	public function dispatchFrom($command, ArrayAccess $source, array $extras = [])
-	{
-		return $this->dispatch($this->marshal($command, $source, $extras));
-	}
+    /**
+     * Dispatch a command to its appropriate handler in the current process without using the synchronous queue.
+     *
+     * @param  mixed  $command
+     * @param  mixed  $handler
+     * @return mixed
+     */
+    public function dispatchNow($command, $handler = null)
+    {
+        $uses = class_uses_recursive($command);
 
-	/**
-	 * Marshal a command from the given array.
-	 *
-	 * @param  string  $command
-	 * @param  array  $array
-	 * @return mixed
-	 */
-	protected function marshalFromArray($command, array $array)
-	{
-		return $this->marshal($command, new Collection, $array);
-	}
+        if (in_array(InteractsWithQueue::class, $uses) &&
+            in_array(Queueable::class, $uses) &&
+            ! $command->job) {
+            $command->setJob(new SyncJob($this->container, json_encode([]), 'sync', 'sync'));
+        }
 
-	/**
-	 * Marshal a command from the given array accessible object.
-	 *
-	 * @param  string  $command
-	 * @param  \ArrayAccess  $source
-	 * @param  array  $extras
-	 * @return mixed
-	 */
-	protected function marshal($command, ArrayAccess $source, array $extras = [])
-	{
-		$injected = [];
+        if ($handler || $handler = $this->getCommandHandler($command)) {
+            $callback = function ($command) use ($handler) {
+                $method = method_exists($handler, 'handle') ? 'handle' : '__invoke';
 
-		$reflection = new ReflectionClass($command);
+                return $handler->{$method}($command);
+            };
+        } else {
+            $callback = function ($command) {
+                $method = method_exists($command, 'handle') ? 'handle' : '__invoke';
 
-		if ($constructor = $reflection->getConstructor())
-		{
-			$injected = array_map(function($parameter) use ($command, $source, $extras)
-			{
-				return $this->getParameterValueForCommand($command, $source, $parameter, $extras);
+                return $this->container->call([$command, $method]);
+            };
+        }
 
-			}, $constructor->getParameters());
-		}
+        return $this->pipeline->send($command)->through($this->pipes)->then($callback);
+    }
 
-		return $reflection->newInstanceArgs($injected);
-	}
+    /**
+     * Attempt to find the batch with the given ID.
+     *
+     * @param  string  $batchId
+     * @return \Illuminate\Bus\Batch|null
+     */
+    public function findBatch(string $batchId)
+    {
+        return $this->container->make(BatchRepository::class)->find($batchId);
+    }
 
-	/**
-	 * Get a parameter value for a marshaled command.
-	 *
-	 * @param  string  $command
-	 * @param  \ArrayAccess  $source
-	 * @param  \ReflectionParameter  $parameter
-	 * @param  array  $extras
-	 * @return mixed
-	 */
-	protected function getParameterValueForCommand($command, ArrayAccess $source,
-                                                   ReflectionParameter $parameter, array $extras = array())
-	{
-		if (array_key_exists($parameter->name, $extras))
-		{
-			return $extras[$parameter->name];
-		}
+    /**
+     * Create a new batch of queueable jobs.
+     *
+     * @param  \Illuminate\Support\Collection|array|mixed  $jobs
+     * @return \Illuminate\Bus\PendingBatch
+     */
+    public function batch($jobs)
+    {
+        return new PendingBatch($this->container, Collection::wrap($jobs));
+    }
 
-		if (isset($source[$parameter->name]))
-		{
-			return $source[$parameter->name];
-		}
+    /**
+     * Create a new chain of queueable jobs.
+     *
+     * @param  \Illuminate\Support\Collection|array  $jobs
+     * @return \Illuminate\Foundation\Bus\PendingChain
+     */
+    public function chain($jobs)
+    {
+        $jobs = Collection::wrap($jobs);
+        $jobs = ChainedBatch::prepareNestedBatches($jobs);
 
-		if ($parameter->isDefaultValueAvailable())
-		{
-			return $parameter->getDefaultValue();
-		}
+        return new PendingChain($jobs->shift(), $jobs->toArray());
+    }
 
-		MarshalException::whileMapping($command, $parameter);
-	}
+    /**
+     * Determine if the given command has a handler.
+     *
+     * @param  mixed  $command
+     * @return bool
+     */
+    public function hasCommandHandler($command)
+    {
+        return array_key_exists(get_class($command), $this->handlers);
+    }
 
-	/**
-	 * Dispatch a command to its appropriate handler.
-	 *
-	 * @param  mixed  $command
-	 * @param  \Closure|null  $afterResolving
-	 * @return mixed
-	 */
-	public function dispatch($command, Closure $afterResolving = null)
-	{
-		if ($this->queueResolver && $this->commandShouldBeQueued($command))
-		{
-			return $this->dispatchToQueue($command);
-		}
-		else
-		{
-			return $this->dispatchNow($command, $afterResolving);
-		}
-	}
+    /**
+     * Retrieve the handler for a command.
+     *
+     * @param  mixed  $command
+     * @return bool|mixed
+     */
+    public function getCommandHandler($command)
+    {
+        if ($this->hasCommandHandler($command)) {
+            return $this->container->make($this->handlers[get_class($command)]);
+        }
 
-	/**
-	 * Dispatch a command to its appropriate handler in the current process.
-	 *
-	 * @param  mixed  $command
-	 * @param  \Closure|null  $afterResolving
-	 * @return mixed
-	 */
-	public function dispatchNow($command, Closure $afterResolving = null)
-	{
-		return $this->pipeline->send($command)->through($this->pipes)->then(function($command) use ($afterResolving)
-		{
-			if ($command instanceof SelfHandling)
-				return $this->container->call([$command, 'handle']);
+        return false;
+    }
 
-			$handler = $this->resolveHandler($command);
+    /**
+     * Determine if the given command should be queued.
+     *
+     * @param  mixed  $command
+     * @return bool
+     */
+    protected function commandShouldBeQueued($command)
+    {
+        return $command instanceof ShouldQueue;
+    }
 
-			if ($afterResolving)
-				call_user_func($afterResolving, $handler);
+    /**
+     * Dispatch a command to its appropriate handler behind a queue.
+     *
+     * @param  mixed  $command
+     * @return mixed
+     *
+     * @throws \RuntimeException
+     */
+    public function dispatchToQueue($command)
+    {
+        $connection = $command->connection ?? null;
 
-			return call_user_func(
-				[$handler, $this->getHandlerMethod($command)], $command
-			);
-		});
+        $queue = call_user_func($this->queueResolver, $connection);
 
-	}
+        if (! $queue instanceof Queue) {
+            throw new RuntimeException('Queue resolver did not return a Queue implementation.');
+        }
 
-	/**
-	 * Determine if the given command should be queued.
-	 *
-	 * @param  mixed  $command
-	 * @return bool
-	 */
-	protected function commandShouldBeQueued($command)
-	{
-		if ($command instanceof ShouldBeQueued) return true;
+        if (method_exists($command, 'queue')) {
+            return $command->queue($queue, $command);
+        }
 
-		return (new ReflectionClass($this->getHandlerClass($command)))->implementsInterface(
-			'Illuminate\Contracts\Queue\ShouldBeQueued'
-		);
-	}
+        return $this->pushCommandToQueue($queue, $command);
+    }
 
-	/**
-	 * Dispatch a command to its appropriate handler behind a queue.
-	 *
-	 * @param  mixed  $command
-	 * @return mixed
-	 *
-	 * @throws \RuntimeException
-	 */
-	public function dispatchToQueue($command)
-	{
-		$queue = call_user_func($this->queueResolver);
+    /**
+     * Push the command onto the given queue instance.
+     *
+     * @param  \Illuminate\Contracts\Queue\Queue  $queue
+     * @param  mixed  $command
+     * @return mixed
+     */
+    protected function pushCommandToQueue($queue, $command)
+    {
+        if (isset($command->queue, $command->delay)) {
+            return $queue->laterOn($command->queue, $command->delay, $command);
+        }
 
-		if ( ! $queue instanceof Queue)
-		{
-			throw new \RuntimeException("Queue resolver did not return a Queue implementation.");
-		}
+        if (isset($command->queue)) {
+            return $queue->pushOn($command->queue, $command);
+        }
 
-		if (method_exists($command, 'queue'))
-		{
-			$command->queue($queue, $command);
-		}
-		else
-		{
-			$queue->push($command);
-		}
-	}
+        if (isset($command->delay)) {
+            return $queue->later($command->delay, $command);
+        }
 
-	/**
-	 * Get the handler instance for the given command.
-	 *
-	 * @param  mixed  $command
-	 * @return mixed
-	 */
-	public function resolveHandler($command)
-	{
-		if ($command instanceof SelfHandling) return $command;
+        return $queue->push($command);
+    }
 
-		return $this->container->make($this->getHandlerClass($command));
-	}
+    /**
+     * Dispatch a command to its appropriate handler after the current process.
+     *
+     * @param  mixed  $command
+     * @param  mixed  $handler
+     * @return void
+     */
+    public function dispatchAfterResponse($command, $handler = null)
+    {
+        $this->container->terminating(function () use ($command, $handler) {
+            $this->dispatchSync($command, $handler);
+        });
+    }
 
-	/**
-	 * Get the handler class for the given command.
-	 *
-	 * @param  mixed  $command
-	 * @return string
-	 */
-	public function getHandlerClass($command)
-	{
-		if ($command instanceof SelfHandling) return get_class($command);
+    /**
+     * Set the pipes through which commands should be piped before dispatching.
+     *
+     * @param  array  $pipes
+     * @return $this
+     */
+    public function pipeThrough(array $pipes)
+    {
+        $this->pipes = $pipes;
 
-		return $this->inflectSegment($command, 0);
-	}
+        return $this;
+    }
 
-	/**
-	 * Get the handler method for the given command.
-	 *
-	 * @param  mixed  $command
-	 * @return string
-	 */
-	public function getHandlerMethod($command)
-	{
-		if ($command instanceof SelfHandling) return 'handle';
+    /**
+     * Map a command to a handler.
+     *
+     * @param  array  $map
+     * @return $this
+     */
+    public function map(array $map)
+    {
+        $this->handlers = array_merge($this->handlers, $map);
 
-		return $this->inflectSegment($command, 1);
-	}
-
-	/**
-	 * Get the given handler segment for the given command.
-	 *
-	 * @param  mixed  $command
-	 * @param  int  $segment
-	 * @return string
-	 */
-	protected function inflectSegment($command, $segment)
-	{
-		$className = get_class($command);
-
-		if (isset($this->mappings[$className]))
-		{
-			return $this->getMappingSegment($className, $segment);
-		}
-		elseif ($this->mapper)
-		{
-			return $this->getMapperSegment($command, $segment);
-		}
-
-		throw new \InvalidArgumentException("No handler registered for command [{$className}]");
-	}
-
-	/**
-	 * Get the given segment from a given class handler.
-	 *
-	 * @param  string  $className
-	 * @param  int  $segment
-	 * @return string
-	 */
-	protected function getMappingSegment($className, $segment)
-	{
-		return explode('@', $this->mappings[$className])[$segment];
-	}
-
-	/**
-	 * Get the given segment from a given class handler using the custom mapper.
-	 *
-	 * @param  mixed  $command
-	 * @param  int  $segment
-	 * @return string
-	 */
-	protected function getMapperSegment($command, $segment)
-	{
-		return explode('@', call_user_func($this->mapper, $command))[$segment];
-	}
-
-	/**
-	 * Register command to handler mappings.
-	 *
-	 * @param  array  $commands
-	 * @return void
-	 */
-	public function maps(array $commands)
-	{
-		$this->mappings = array_merge($this->mappings, $commands);
-	}
-
-	/**
-	 * Register a fallback mapper callback.
-	 *
-	 * @param  \Closure  $mapper
-	 * @return void
-	 */
-	public function mapUsing(Closure $mapper)
-	{
-		$this->mapper = $mapper;
-	}
-
-	/**
-	 * Map the command to a handler within a given root namespace.
-	 *
-	 * @param  mixed  $command
-	 * @param  string  $commandNamespace
-	 * @param  string  $handlerNamespace
-	 * @return string
-	 */
-	public static function simpleMapping($command, $commandNamespace, $handlerNamespace)
-	{
-		$command = str_replace($commandNamespace, '', get_class($command));
-
-		return $handlerNamespace.'\\'.trim($command, '\\').'Handler@handle';
-	}
-
-	/**
-	 * Set the pipes commands should be piped through before dispatching.
-	 *
-	 * @param  array  $pipes
-	 * @return $this
-	 */
-	public function pipeThrough(array $pipes)
-	{
-		$this->pipes = $pipes;
-
-		return $this;
-	}
-
+        return $this;
+    }
 }

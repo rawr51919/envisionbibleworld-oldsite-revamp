@@ -1,76 +1,108 @@
-<?php namespace Illuminate\Validation;
+<?php
 
-use Illuminate\Contracts\Validation\ValidationException;
-use Illuminate\Contracts\Validation\UnauthorizedException;
+namespace Illuminate\Validation;
+
+use Illuminate\Foundation\Precognition;
 
 /**
  * Provides default implementation of ValidatesWhenResolved contract.
  */
-trait ValidatesWhenResolvedTrait {
+trait ValidatesWhenResolvedTrait
+{
+    /**
+     * Validate the class instance.
+     *
+     * @return void
+     */
+    public function validateResolved()
+    {
+        $this->prepareForValidation();
 
-	/**
-	 * Validate the class instance.
-	 *
-	 * @return void
-	 */
-	public function validate()
-	{
-		$instance = $this->getValidatorInstance();
+        if (! $this->passesAuthorization()) {
+            $this->failedAuthorization();
+        }
 
-		if ( ! $this->passesAuthorization())
-		{
-			$this->failedAuthorization();
-		}
-		elseif ( ! $instance->passes())
-		{
-			$this->failedValidation($instance);
-		}
-	}
+        $instance = $this->getValidatorInstance();
 
-	/**
-	 * Get the validator instance for the request.
-	 *
-	 * @return \Illuminate\Validation\Validator
-	 */
-	protected function getValidatorInstance()
-	{
-		return $this->validator();
-	}
+        if ($this->isPrecognitive()) {
+            $instance->after(Precognition::afterValidationHook($this));
+        }
 
-	/**
-	 * Handle a failed validation attempt.
-	 *
-	 * @param  \Illuminate\Validation\Validator  $validator
-	 * @return mixed
-	 */
-	protected function failedValidation(Validator $validator)
-	{
-		throw new ValidationException($validator);
-	}
+        if ($instance->fails()) {
+            $this->failedValidation($instance);
+        }
 
-	/**
-	 * Deteremine if the request passes the authorization check.
-	 *
-	 * @return bool
-	 */
-	protected function passesAuthorization()
-	{
-		if (method_exists($this, 'authorize'))
-		{
-			return $this->authorize();
-		}
+        $this->passedValidation();
+    }
 
-		return true;
-	}
+    /**
+     * Prepare the data for validation.
+     *
+     * @return void
+     */
+    protected function prepareForValidation()
+    {
+        //
+    }
 
-	/**
-	 * Handle a failed authorization attempt.
-	 *
-	 * @return mixed
-	 */
-	protected function failedAuthorization()
-	{
-		throw new UnauthorizedException;
-	}
+    /**
+     * Get the validator instance for the request.
+     *
+     * @return \Illuminate\Validation\Validator
+     */
+    protected function getValidatorInstance()
+    {
+        return $this->validator();
+    }
 
+    /**
+     * Handle a passed validation attempt.
+     *
+     * @return void
+     */
+    protected function passedValidation()
+    {
+        //
+    }
+
+    /**
+     * Handle a failed validation attempt.
+     *
+     * @param  \Illuminate\Validation\Validator  $validator
+     * @return void
+     *
+     * @throws \Illuminate\Validation\ValidationException
+     */
+    protected function failedValidation(Validator $validator)
+    {
+        $exception = $validator->getException();
+
+        throw new $exception($validator);
+    }
+
+    /**
+     * Determine if the request passes the authorization check.
+     *
+     * @return bool
+     */
+    protected function passesAuthorization()
+    {
+        if (method_exists($this, 'authorize')) {
+            return $this->authorize();
+        }
+
+        return true;
+    }
+
+    /**
+     * Handle a failed authorization attempt.
+     *
+     * @return void
+     *
+     * @throws \Illuminate\Validation\UnauthorizedException
+     */
+    protected function failedAuthorization()
+    {
+        throw new UnauthorizedException;
+    }
 }

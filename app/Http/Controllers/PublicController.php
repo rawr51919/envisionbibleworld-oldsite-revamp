@@ -1,5 +1,7 @@
 <?php
+
 namespace App\Http\Controllers;
+
 use App\Category;
 use App\Era;
 use App\Source;
@@ -10,7 +12,8 @@ use Illuminate\Support\Facades\DB;
 use Yajra\Datatables\Datatables;
 
 
-class PublicController extends Controller {
+class PublicController extends Controller
+{
 
     /*
     |--------------------------------------------------------------------------
@@ -42,11 +45,11 @@ class PublicController extends Controller {
     {
         return view('public');
     }
-        
-        public function aboutdatabase()
-        {
-            return view('public.aboutdatabase');
-        }
+
+    public function aboutdatabase()
+    {
+        return view('public.aboutdatabase');
+    }
 
     public function background()
     {
@@ -60,7 +63,7 @@ class PublicController extends Controller {
 
     public function categories()
     {
-        $items = Category::select('Category','CategoryId')->orderBy('Category')->get()->lists('Category', 'CategoryId');
+        $items = Category::select('Category', 'CategoryId')->orderBy('Category')->get()->lists('Category', 'CategoryId');
         return view('public.categories', compact('items'));
     }
 
@@ -99,7 +102,7 @@ class PublicController extends Controller {
     {
         return view('public.lifestyles-jesus-time');
     }
-        
+
     public function oldandnew()
     {
         return view('public.oldandnewtestamenttimes');
@@ -110,10 +113,11 @@ class PublicController extends Controller {
         return view('public.storiesaboutjesus');
     }
 
-    public function getPublicSources(){
+    public function getPublicSources()
+    {
 
-//        This code is for postgreSql database
-//        $subQuery = Source::select(DB::raw('DISTINCT ON ("SourceName") "SourceName", "SourceId"'));
+        //        This code is for postgreSql database
+        //        $subQuery = Source::select(DB::raw('DISTINCT ON ("SourceName") "SourceName", "SourceId"'));
         $subQuery = Source::select(DB::raw('DISTINCT SourceName, SourceId'));
 
         $query = Source::select()->from(DB::raw(' ( ' . $subQuery->toSql() . ' ) AS sources '))
@@ -123,16 +127,19 @@ class PublicController extends Controller {
         return Datatables::of($query)->make(true);
     }
 
-    public function getPublicSubCategories(Request $request) {
+    public function getPublicSubCategories(Request $request)
+    {
         $id = $request->id;
         return Datatables::of(SubCategory::select('Subcategory')->where('CategoryId', '=', $id))->make(true);
     }
 
-    public function getPublicEras() {
+    public function getPublicEras()
+    {
         return Datatables::of(Era::query()->get())->make(true);
     }
 
-    public function getPublicStandard() {
+    public function getPublicStandard()
+    {
         $data = SummaryDetails::leftJoin('tblSummary', 'tblSummary_Details.SummaryId', '=', 'tblSummary.SummaryId')
 
             //For version 2, 3
@@ -149,11 +156,24 @@ class PublicController extends Controller {
             ->leftJoin('tblSubCategory', 'tblSummary_Details.SubcategoryId', '=', 'tblSubCategory.SubcategoryId')
             ->leftJoin('tblCategory', 'tblSubCategory.CategoryId', '=', 'tblCategory.CategoryId')
             ->leftJoin('tblStatusType', 'tblSummary_Details.StatusTypeId', '=', 'tblStatusType.StatusTypeId')
-            ->select('tblSummary_Details.Summary_DetailsId','tblSummary.Summary', 'tblEra.Era', 'tblCategory.Category',   'tblSubCategory.Subcategory',
-                'tblSource.SourceName', 'tblSource_Type.Source_Type', 'tblSource_Type.Source_Type_Abbreviation', 'tblSource_Quoted.BeginChptrSectionMinute', 'tblSource_Quoted.BeginVersePageSecond',
-                'tblSource_Quoted.EndChptrSectionMinute', 'tblSource_Quoted.EndVersePageSecond', 'tblSource_Quoted.Source_Explanation',
-                'tblQuotation.Quotation', 'tblStatusType.StatusType')
-                        ->where('tblSummary_Details.StatusTypeId', '=', '2')
+            ->select(
+                'tblSummary_Details.Summary_DetailsId',
+                'tblSummary.Summary',
+                'tblEra.Era',
+                'tblCategory.Category',
+                'tblSubCategory.Subcategory',
+                'tblSource.SourceName',
+                'tblSource_Type.Source_Type',
+                'tblSource_Type.Source_Type_Abbreviation',
+                'tblSource_Quoted.BeginChptrSectionMinute',
+                'tblSource_Quoted.BeginVersePageSecond',
+                'tblSource_Quoted.EndChptrSectionMinute',
+                'tblSource_Quoted.EndVersePageSecond',
+                'tblSource_Quoted.Source_Explanation',
+                'tblQuotation.Quotation',
+                'tblStatusType.StatusType'
+            )
+            ->where('tblSummary_Details.StatusTypeId', '=', '2')
             ->get();
         return Datatables::of($data)->make(true);
     }

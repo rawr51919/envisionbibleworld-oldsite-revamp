@@ -1,387 +1,323 @@
-<?php namespace Illuminate\Console;
+<?php
 
-use Symfony\Component\Console\Helper\Table;
-use Symfony\Component\Console\Input\ArrayInput;
-use Symfony\Component\Console\Output\NullOutput;
-use Symfony\Component\Console\Question\Question;
+namespace Illuminate\Console;
+
+use Illuminate\Console\View\Components\Factory;
+use Illuminate\Contracts\Console\Isolatable;
+use Illuminate\Support\Traits\Macroable;
+use Symfony\Component\Console\Command\Command as SymfonyCommand;
 use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Console\Question\ChoiceQuestion;
-use Symfony\Component\Console\Question\ConfirmationQuestion;
-use Illuminate\Contracts\Foundation\Application as LaravelApplication;
+use Throwable;
 
-class Command extends \Symfony\Component\Console\Command\Command {
+class Command extends SymfonyCommand
+{
+    use Concerns\CallsCommands,
+        Concerns\ConfiguresPrompts,
+        Concerns\HasParameters,
+        Concerns\InteractsWithIO,
+        Concerns\InteractsWithSignals,
+        Concerns\PromptsForMissingInput,
+        Macroable;
 
-	/**
-	 * The Laravel application instance.
-	 *
-	 * @var \Illuminate\Contracts\Foundation\Application
-	 */
-	protected $laravel;
+    /**
+     * The Laravel application instance.
+     *
+     * @var \Illuminate\Contracts\Foundation\Application
+     */
+    protected $laravel;
 
-	/**
-	 * The input interface implementation.
-	 *
-	 * @var \Symfony\Component\Console\Input\InputInterface
-	 */
-	protected $input;
+    /**
+     * The name and signature of the console command.
+     *
+     * @var string
+     */
+    protected $signature;
 
-	/**
-	 * The output interface implementation.
-	 *
-	 * @var \Symfony\Component\Console\Output\OutputInterface
-	 */
-	protected $output;
+    /**
+     * The console command name.
+     *
+     * @var string
+     */
+    protected $name;
 
-	/**
-	 * The console command name.
-	 *
-	 * @var string
-	 */
-	protected $name;
+    /**
+     * The console command description.
+     *
+     * @var string|null
+     */
+    protected $description;
 
-	/**
-	 * The console command description.
-	 *
-	 * @var string
-	 */
-	protected $description;
+    /**
+     * The console command help text.
+     *
+     * @var string
+     */
+    protected $help;
 
-	/**
-	 * Create a new console command instance.
-	 *
-	 * @return void
-	 */
-	public function __construct()
-	{
-		parent::__construct($this->name);
+    /**
+     * Indicates whether the command should be shown in the Artisan command list.
+     *
+     * @var bool
+     */
+    protected $hidden = false;
 
-		// We will go ahead and set the name, description, and parameters on console
-		// commands just to make things a little easier on the developer. This is
-		// so they don't have to all be manually specified in the constructors.
-		$this->setDescription($this->description);
+    /**
+     * Indicates whether only one instance of the command can run at any given time.
+     *
+     * @var bool
+     */
+    protected $isolated = false;
 
-		$this->specifyParameters();
-	}
+    /**
+     * The default exit code for isolated commands.
+     *
+     * @var int
+     */
+    protected $isolatedExitCode = self::SUCCESS;
 
-	/**
-	 * Specify the arguments and options on the command.
-	 *
-	 * @return void
-	 */
-	protected function specifyParameters()
-	{
-		// We will loop through all of the arguments and options for the command and
-		// set them all on the base command instance. This specifies what can get
-		// passed into these commands as "parameters" to control the execution.
-		foreach ($this->getArguments() as $arguments)
-		{
-			call_user_func_array(array($this, 'addArgument'), $arguments);
-		}
+    /**
+     * The console command name aliases.
+     *
+     * @var array
+     */
+    protected $aliases;
 
-		foreach ($this->getOptions() as $options)
-		{
-			call_user_func_array(array($this, 'addOption'), $options);
-		}
-	}
+    /**
+     * Create a new console command instance.
+     *
+     * @return void
+     */
+    public function __construct()
+    {
+        // We will go ahead and set the name, description, and parameters on console
+        // commands just to make things a little easier on the developer. This is
+        // so they don't have to all be manually specified in the constructors.
+        if (isset($this->signature)) {
+            $this->configureUsingFluentDefinition();
+        } else {
+            parent::__construct($this->name);
+        }
 
-	/**
-	 * Run the console command.
-	 *
-	 * @param  \Symfony\Component\Console\Input\InputInterface  $input
-	 * @param  \Symfony\Component\Console\Output\OutputInterface  $output
-	 * @return int
-	 */
-	public function run(InputInterface $input, OutputInterface $output)
-	{
-		$this->input = $input;
+        // Once we have constructed the command, we'll set the description and other
+        // related properties of the command. If a signature wasn't used to build
+        // the command we'll set the arguments and the options on this command.
+        if (! isset($this->description)) {
+            $this->setDescription((string) static::getDefaultDescription());
+        } else {
+            $this->setDescription((string) $this->description);
+        }
 
-		$this->output = $output;
+        $this->setHelp((string) $this->help);
 
-		return parent::run($input, $output);
-	}
+        $this->setHidden($this->isHidden());
 
-	/**
-	 * Execute the console command.
-	 *
-	 * @param  \Symfony\Component\Console\Input\InputInterface  $input
-	 * @param  \Symfony\Component\Console\Output\OutputInterface  $output
-	 * @return mixed
-	 */
-	protected function execute(InputInterface $input, OutputInterface $output)
-	{
-		$method = method_exists($this, 'handle') ? 'handle' : 'fire';
+        if (isset($this->aliases)) {
+            $this->setAliases((array) $this->aliases);
+        }
 
-		return $this->laravel->call([$this, $method]);
-	}
+        if (! isset($this->signature)) {
+            $this->specifyParameters();
+        }
 
-	/**
-	 * Call another console command.
-	 *
-	 * @param  string  $command
-	 * @param  array   $arguments
-	 * @return int
-	 */
-	public function call($command, array $arguments = array())
-	{
-		$instance = $this->getApplication()->find($command);
+        if ($this instanceof Isolatable) {
+            $this->configureIsolation();
+        }
+    }
 
-		$arguments['command'] = $command;
+    /**
+     * Configure the console command using a fluent definition.
+     *
+     * @return void
+     */
+    protected function configureUsingFluentDefinition()
+    {
+        [$name, $arguments, $options] = Parser::parse($this->signature);
 
-		return $instance->run(new ArrayInput($arguments), $this->output);
-	}
+        parent::__construct($this->name = $name);
 
-	/**
-	 * Call another console command silently.
-	 *
-	 * @param  string  $command
-	 * @param  array   $arguments
-	 * @return int
-	 */
-	public function callSilent($command, array $arguments = array())
-	{
-		$instance = $this->getApplication()->find($command);
+        // After parsing the signature we will spin through the arguments and options
+        // and set them on this command. These will already be changed into proper
+        // instances of these "InputArgument" and "InputOption" Symfony classes.
+        $this->getDefinition()->addArguments($arguments);
+        $this->getDefinition()->addOptions($options);
+    }
 
-		$arguments['command'] = $command;
+    /**
+     * Configure the console command for isolation.
+     *
+     * @return void
+     */
+    protected function configureIsolation()
+    {
+        $this->getDefinition()->addOption(new InputOption(
+            'isolated',
+            null,
+            InputOption::VALUE_OPTIONAL,
+            'Do not run the command if another instance of the command is already running',
+            $this->isolated
+        ));
+    }
 
-		return $instance->run(new ArrayInput($arguments), new NullOutput);
-	}
+    /**
+     * Run the console command.
+     *
+     * @param  \Symfony\Component\Console\Input\InputInterface  $input
+     * @param  \Symfony\Component\Console\Output\OutputInterface  $output
+     * @return int
+     */
+    #[\Override]
+    public function run(InputInterface $input, OutputInterface $output): int
+    {
+        $this->output = $output instanceof OutputStyle ? $output : $this->laravel->make(
+            OutputStyle::class, ['input' => $input, 'output' => $output]
+        );
 
-	/**
-	 * Get the value of a command argument.
-	 *
-	 * @param  string  $key
-	 * @return string|array
-	 */
-	public function argument($key = null)
-	{
-		if (is_null($key)) return $this->input->getArguments();
+        $this->components = $this->laravel->make(Factory::class, ['output' => $this->output]);
 
-		return $this->input->getArgument($key);
-	}
+        $this->configurePrompts($input);
 
-	/**
-	 * Get the value of a command option.
-	 *
-	 * @param  string  $key
-	 * @return string|array
-	 */
-	public function option($key = null)
-	{
-		if (is_null($key)) return $this->input->getOptions();
+        try {
+            return parent::run(
+                $this->input = $input, $this->output
+            );
+        } finally {
+            $this->untrap();
+        }
+    }
 
-		return $this->input->getOption($key);
-	}
+    /**
+     * Execute the console command.
+     *
+     * @param  \Symfony\Component\Console\Input\InputInterface  $input
+     * @param  \Symfony\Component\Console\Output\OutputInterface  $output
+     */
+    #[\Override]
+    protected function execute(InputInterface $input, OutputInterface $output): int
+    {
+        if ($this instanceof Isolatable && $this->option('isolated') !== false &&
+            ! $this->commandIsolationMutex()->create($this)) {
+            $this->comment(sprintf(
+                'The [%s] command is already running.', $this->getName()
+            ));
 
-	/**
-	 * Confirm a question with the user.
-	 *
-	 * @param  string  $question
-	 * @param  bool    $default
-	 * @return bool
-	 */
-	public function confirm($question, $default = false)
-	{
-		$helper = $this->getHelperSet()->get('question');
+            return (int) (is_numeric($this->option('isolated'))
+                        ? $this->option('isolated')
+                        : $this->isolatedExitCode);
+        }
 
-		$question = new ConfirmationQuestion("<question>{$question}</question> ", $default);
+        $method = method_exists($this, 'handle') ? 'handle' : '__invoke';
 
-		return $helper->ask($this->input, $this->output, $question);
-	}
+        try {
+            return (int) $this->laravel->call([$this, $method]);
+        } catch (ManuallyFailedException $e) {
+            $this->components->error($e->getMessage());
 
-	/**
-	 * Prompt the user for input.
-	 *
-	 * @param  string  $question
-	 * @param  string  $default
-	 * @return string
-	 */
-	public function ask($question, $default = null)
-	{
-		$helper = $this->getHelperSet()->get('question');
+            return static::FAILURE;
+        } finally {
+            if ($this instanceof Isolatable && $this->option('isolated') !== false) {
+                $this->commandIsolationMutex()->forget($this);
+            }
+        }
+    }
 
-		$question = new Question("<question>$question</question> ", $default);
+    /**
+     * Get a command isolation mutex instance for the command.
+     *
+     * @return \Illuminate\Console\CommandMutex
+     */
+    protected function commandIsolationMutex()
+    {
+        return $this->laravel->bound(CommandMutex::class)
+            ? $this->laravel->make(CommandMutex::class)
+            : $this->laravel->make(CacheCommandMutex::class);
+    }
 
-		return $helper->ask($this->input, $this->output, $question);
-	}
+    /**
+     * Resolve the console command instance for the given command.
+     *
+     * @param  \Symfony\Component\Console\Command\Command|string  $command
+     * @return \Symfony\Component\Console\Command\Command
+     */
+    protected function resolveCommand($command)
+    {
+        if (! class_exists($command)) {
+            return $this->getApplication()->find($command);
+        }
 
-	/**
-	 * Prompt the user for input with auto completion.
-	 *
-	 * @param  string  $question
-	 * @param  array   $choices
-	 * @param  string  $default
-	 * @return string
-	 */
-	public function askWithCompletion($question, array $choices, $default = null)
-	{
-		$helper = $this->getHelperSet()->get('question');
+        $command = $this->laravel->make($command);
 
-		$question = new Question("<question>$question</question> ", $default);
+        if ($command instanceof SymfonyCommand) {
+            $command->setApplication($this->getApplication());
+        }
 
-		$question->setAutocompleterValues($choices);
+        if ($command instanceof self) {
+            $command->setLaravel($this->getLaravel());
+        }
 
-		return $helper->ask($this->input, $this->output, $question);
-	}
+        return $command;
+    }
 
-	/**
-	 * Prompt the user for input but hide the answer from the console.
-	 *
-	 * @param  string  $question
-	 * @param  bool    $fallback
-	 * @return string
-	 */
-	public function secret($question, $fallback = true)
-	{
-		$helper = $this->getHelperSet()->get('question');
+    /**
+     * Fail the command manually.
+     *
+     * @param  \Throwable|string|null  $exception
+     * @return void
+     */
+    public function fail(Throwable|string|null $exception = null)
+    {
+        if (is_null($exception)) {
+            $exception = 'Command failed manually.';
+        }
 
-		$question = new Question("<question>$question</question> ");
+        if (is_string($exception)) {
+            $exception = new ManuallyFailedException($exception);
+        }
 
-		$question->setHidden(true)->setHiddenFallback($fallback);
+        throw $exception;
+    }
 
-		return $helper->ask($this->input, $this->output, $question);
-	}
+    /**
+     * {@inheritdoc}
+     *
+     * @return bool
+     */
+    #[\Override]
+    public function isHidden(): bool
+    {
+        return $this->hidden;
+    }
 
-	/**
-	 * Give the user a single choice from an array of answers.
-	 *
-	 * @param  string  $question
-	 * @param  array   $choices
-	 * @param  string  $default
-	 * @param  mixed   $attempts
-	 * @param  bool    $multiple
-	 * @return bool
-	 */
-	public function choice($question, array $choices, $default = null, $attempts = null, $multiple = null)
-	{
-		$helper = $this->getHelperSet()->get('question');
+    /**
+     * {@inheritdoc}
+     */
+    #[\Override]
+    public function setHidden(bool $hidden = true): static
+    {
+        parent::setHidden($this->hidden = $hidden);
 
-		$question = new ChoiceQuestion("<question>$question</question> ", $choices, $default);
+        return $this;
+    }
 
-		$question->setMaxAttempts($attempts)->setMultiselect($multiple);
+    /**
+     * Get the Laravel application instance.
+     *
+     * @return \Illuminate\Contracts\Foundation\Application
+     */
+    public function getLaravel()
+    {
+        return $this->laravel;
+    }
 
-		return $helper->ask($this->input, $this->output, $question);
-	}
-
-	/**
-	 * Format input to textual table
-	 *
-	 * @param  array   $headers
-	 * @param  array   $rows
-	 * @param  string  $style
-	 * @return void
-	 */
-	public function table(array $headers, array $rows, $style = 'default')
-	{
-		$table = new Table($this->output);
-
-		$table->setHeaders($headers)->setRows($rows)->setStyle($style)->render();
-	}
-
-	/**
-	 * Write a string as information output.
-	 *
-	 * @param  string  $string
-	 * @return void
-	 */
-	public function info($string)
-	{
-		$this->output->writeln("<info>$string</info>");
-	}
-
-	/**
-	 * Write a string as standard output.
-	 *
-	 * @param  string  $string
-	 * @return void
-	 */
-	public function line($string)
-	{
-		$this->output->writeln($string);
-	}
-
-	/**
-	 * Write a string as comment output.
-	 *
-	 * @param  string  $string
-	 * @return void
-	 */
-	public function comment($string)
-	{
-		$this->output->writeln("<comment>$string</comment>");
-	}
-
-	/**
-	 * Write a string as question output.
-	 *
-	 * @param  string  $string
-	 * @return void
-	 */
-	public function question($string)
-	{
-		$this->output->writeln("<question>$string</question>");
-	}
-
-	/**
-	 * Write a string as error output.
-	 *
-	 * @param  string  $string
-	 * @return void
-	 */
-	public function error($string)
-	{
-		$this->output->writeln("<error>$string</error>");
-	}
-
-	/**
-	 * Get the console command arguments.
-	 *
-	 * @return array
-	 */
-	protected function getArguments()
-	{
-		return array();
-	}
-
-	/**
-	 * Get the console command options.
-	 *
-	 * @return array
-	 */
-	protected function getOptions()
-	{
-		return array();
-	}
-
-	/**
-	 * Get the output implementation.
-	 *
-	 * @return \Symfony\Component\Console\Output\OutputInterface
-	 */
-	public function getOutput()
-	{
-		return $this->output;
-	}
-
-	/**
-	 * Get the Laravel application instance.
-	 *
-	 * @return \Illuminate\Contracts\Foundation\Application
-	 */
-	public function getLaravel()
-	{
-		return $this->laravel;
-	}
-
-	/**
-	 * Set the Laravel application instance.
-	 *
-	 * @param  \Illuminate\Contracts\Foundation\Application  $laravel
-	 * @return void
-	 */
-	public function setLaravel(LaravelApplication $laravel)
-	{
-		$this->laravel = $laravel;
-	}
-
+    /**
+     * Set the Laravel application instance.
+     *
+     * @param  \Illuminate\Contracts\Container\Container  $laravel
+     * @return void
+     */
+    public function setLaravel($laravel)
+    {
+        $this->laravel = $laravel;
+    }
 }

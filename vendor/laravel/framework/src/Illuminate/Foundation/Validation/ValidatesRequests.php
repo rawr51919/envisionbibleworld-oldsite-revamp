@@ -1,91 +1,100 @@
-<?php namespace Illuminate\Foundation\Validation;
+<?php
 
+namespace Illuminate\Foundation\Validation;
+
+use Illuminate\Contracts\Validation\Factory;
+use Illuminate\Foundation\Precognition;
 use Illuminate\Http\Request;
-use Illuminate\Http\JsonResponse;
-use Illuminate\Validation\Validator;
-use Illuminate\Http\Exception\HttpResponseException;
+use Illuminate\Validation\ValidationException;
 
-trait ValidatesRequests {
+trait ValidatesRequests
+{
+    /**
+     * Run the validation routine against the given validator.
+     *
+     * @param  \Illuminate\Contracts\Validation\Validator|array  $validator
+     * @param  \Illuminate\Http\Request|null  $request
+     * @return array
+     *
+     * @throws \Illuminate\Validation\ValidationException
+     */
+    public function validateWith($validator, ?Request $request = null)
+    {
+        $request = $request ?: request();
 
-	/**
-	 * Validate the given request with the given rules.
-	 *
-	 * @param  \Illuminate\Http\Request  $request
-	 * @param  array  $rules
-	 * @return void
-	 */
-	public function validate(Request $request, array $rules)
-	{
-		$validator = $this->getValidationFactory()->make($request->all(), $rules);
+        if (is_array($validator)) {
+            $validator = $this->getValidationFactory()->make($request->all(), $validator);
+        }
 
-		if ($validator->fails())
-		{
-			$this->throwValidationException($request, $validator);
-		}
-	}
+        if ($request->isPrecognitive()) {
+            $validator->after(Precognition::afterValidationHook($request))
+                ->setRules(
+                    $request->filterPrecognitiveRules($validator->getRulesWithoutPlaceholders())
+                );
+        }
 
-	/**
-	 * Throw the failed validation exception.
-	 *
-	 * @param  \Illuminate\Http\Request  $request
-	 * @param  \Illuminate\Contracts\Validation\Validator  $validator
-	 * @return void
-	 */
-	protected function throwValidationException(Request $request, $validator)
-	{
-		throw new HttpResponseException($this->buildFailedValidationResponse(
-			$request, $this->formatValidationErrors($validator)
-		));
-	}
+        return $validator->validate();
+    }
 
-	/**
-	 * Create the response for when a request fails validation.
-	 *
-	 * @param  \Illuminate\Http\Request  $request
-	 * @param  array  $errors
-	 * @return \Illuminate\Http\Response
-	 */
-	protected function buildFailedValidationResponse(Request $request, array $errors)
-	{
-		if ($request->ajax())
-		{
-			return new JsonResponse($errors, 422);
-		}
+    /**
+     * Validate the given request with the given rules.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @param  array  $rules
+     * @param  array  $messages
+     * @param  array  $attributes
+     * @return array
+     *
+     * @throws \Illuminate\Validation\ValidationException
+     */
+    public function validate(Request $request, array $rules,
+                             array $messages = [], array $attributes = [])
+    {
+        $validator = $this->getValidationFactory()->make(
+            $request->all(), $rules, $messages, $attributes
+        );
 
-		return redirect()->to($this->getRedirectUrl())
-                        ->withInput($request->input())
-                        ->withErrors($errors);
-	}
+        if ($request->isPrecognitive()) {
+            $validator->after(Precognition::afterValidationHook($request))
+                ->setRules(
+                    $request->filterPrecognitiveRules($validator->getRulesWithoutPlaceholders())
+                );
+        }
 
-	/**
-	 * Format the validation errors to be returned.
-	 *
-	 * @param  \Illuminate\Validation\Validator  $validator
-	 * @return array
-	 */
-	protected function formatValidationErrors(Validator $validator)
-	{
-		return $validator->errors()->getMessages();
-	}
+        return $validator->validate();
+    }
 
-	/**
-	 * Get the URL we should redirect to.
-	 *
-	 * @return string
-	 */
-	protected function getRedirectUrl()
-	{
-		return app('Illuminate\Routing\UrlGenerator')->previous();
-	}
+    /**
+     * Validate the given request with the given rules.
+     *
+     * @param  string  $errorBag
+     * @param  \Illuminate\Http\Request  $request
+     * @param  array  $rules
+     * @param  array  $messages
+     * @param  array  $attributes
+     * @return array
+     *
+     * @throws \Illuminate\Validation\ValidationException
+     */
+    public function validateWithBag($errorBag, Request $request, array $rules,
+                                    array $messages = [], array $attributes = [])
+    {
+        try {
+            return $this->validate($request, $rules, $messages, $attributes);
+        } catch (ValidationException $e) {
+            $e->errorBag = $errorBag;
 
-	/**
-	 * Get a validation factory instance.
-	 *
-	 * @return \Illuminate\Contracts\Validation\Factory
-	 */
-	protected function getValidationFactory()
-	{
-		return app('Illuminate\Contracts\Validation\Factory');
-	}
+            throw $e;
+        }
+    }
 
+    /**
+     * Get a validation factory instance.
+     *
+     * @return \Illuminate\Contracts\Validation\Factory
+     */
+    protected function getValidationFactory()
+    {
+        return app(Factory::class);
+    }
 }

@@ -148,7 +148,7 @@ class SummaryDetailsController extends Controller
         $newSummary = $request->Summary;
         $newQuotation = $request->Quotation;
         $eraId = $request->Era;
-        $categoryId = $request->Category;
+        // $categoryId = $request->Category; (unused for now)
         $subcategoryId = $request->Subcategory;
         $sourceName = $request->SourceName;
         $sourceType = $request->Source_Type;
