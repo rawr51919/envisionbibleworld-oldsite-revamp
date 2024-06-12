@@ -3,7 +3,7 @@
         'name' => 'laravel/laravel',
         'pretty_version' => 'dev-master',
         'version' => 'dev-master',
-        'reference' => '088f65376d15351d228ec48812dc04a017d49800',
+        'reference' => 'ddfe825b85c84a4ece9d12348f5c347ffa76949d',
         'type' => 'project',
         'install_path' => __DIR__ . '/../../',
         'aliases' => array(),
@@ -20,9 +20,9 @@
             'dev_requirement' => false,
         ),
         'aws/aws-sdk-php' => array(
-            'pretty_version' => '3.313.0',
-            'version' => '3.313.0.0',
-            'reference' => '2f5f173300888d6f630ce24751a6ee0f1e6d72e8',
+            'pretty_version' => '3.314.0',
+            'version' => '3.314.0.0',
+            'reference' => '5867f04e0e3959085328d853a743ffc5c8e8ae0b',
             'type' => 'library',
             'install_path' => __DIR__ . '/../aws/aws-sdk-php',
             'aliases' => array(),
@@ -400,7 +400,7 @@
         'laravel/laravel' => array(
             'pretty_version' => 'dev-master',
             'version' => 'dev-master',
-            'reference' => '088f65376d15351d228ec48812dc04a017d49800',
+            'reference' => 'ddfe825b85c84a4ece9d12348f5c347ffa76949d',
             'type' => 'project',
             'install_path' => __DIR__ . '/../../',
             'aliases' => array(),
@@ -775,8 +775,8 @@
         'psr/log-implementation' => array(
             'dev_requirement' => false,
             'provided' => array(
-                0 => '1.0|2.0|3.0',
-                1 => '3.0.0',
+                0 => '3.0.0',
+                1 => '1.0|2.0|3.0',
             ),
         ),
         'psr/simple-cache' => array(
