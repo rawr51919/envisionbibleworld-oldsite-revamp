@@ -3,6 +3,8 @@
 <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <link rel="icon" href="{{ url('img/favicon.png') }}">
+    <meta name="description" content="Envision Bible World">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Online Research | Heather Vincent</title>
 
