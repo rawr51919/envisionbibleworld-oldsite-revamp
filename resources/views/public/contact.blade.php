@@ -1,5 +1,4 @@
 @extends('public')
-
 @section('content')
 <main class="contact">
   <h2>Contact Us</h2>

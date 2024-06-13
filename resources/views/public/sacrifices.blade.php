@@ -1,5 +1,4 @@
 @extends('public')
-
 @section('content')
     <main class="locations">
         <h2>Sacrifices</h2>
@@ -16,7 +15,7 @@
         fulfilled the law--ALL the law--on our behalf? So we wouldn’t have
                 to sacrifice any more?
             </p>
-            <img src="img/goat_and_child.jpg" alt="Picture of a goat with a child"/>
+            <img src="img/goat_and_child.webp" alt="Picture of a goat with a child"/>
         </article>
 
         <article class="bicolumn-right">
@@ -27,7 +26,7 @@
         we appreciate if we can’t comprehend? Wouldn’t this alone make the
         exercise of exploring the sacrifices worth the effort?
             </p>
-            <img src="img/crucified_bone.jpg" alt="Picture of a heal bone with a bent nail sticking out of it from ancient crucified man"/>
+            <img src="img/crucified_bone.webp" alt="Picture of a heal bone with a bent nail sticking out of it from ancient crucified man"/>
         </article>
         <div class="clear"></div>
     </main>

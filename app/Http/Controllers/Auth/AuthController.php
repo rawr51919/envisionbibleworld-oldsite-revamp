@@ -1,11 +1,11 @@
 <?php
 namespace App\Http\Controllers\Auth;
 use App\Http\Controllers\Controller;
-use Illuminate\Contracts\Auth\Guard;
-use Illuminate\Contracts\Auth\UserProvider;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Foundation\Auth\RegistersUsers;
 use Illuminate\Foundation\Auth\AuthenticatesUsers;
-class AuthController extends Controller {
+class AuthController extends Controller
+{
     /*
     |--------------------------------------------------------------------------
     | Registration & Login Controller
@@ -18,19 +18,24 @@ class AuthController extends Controller {
     */
     use AuthenticatesUsers, RegistersUsers;
 
-    protected $auth;
-    protected $userProvider;
-
     /**
      * Create a new authentication controller instance.
      *
-     * @param  \Illuminate\Contracts\Auth\Guard  $auth
-     * @param  \Illuminate\Contracts\Auth\UserProvider  $userProvider
      * @return void
      */
-    public function __construct(Guard $auth, UserProvider $userProvider) {
-        $this->auth = $auth;
-        $this->userProvider = $userProvider;
-        $this->middleware('guest', ['except' => 'getLogout']);
+    public function __construct()
+    {
+        $this->middleware('guest')->except('logout');
+    }
+
+    /**
+     * Log the user out of the application.
+     *
+     * @return \Illuminate\Http\RedirectResponse
+     */
+    public function logout()
+    {
+        Auth::logout();
+        return redirect('/');
     }
 }

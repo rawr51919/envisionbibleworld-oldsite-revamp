@@ -1,5 +1,4 @@
 @extends('public')
-
 @section('content')
     <main class="backgroundinfo">
         <h1>What Drove My Ambition?</h1>
@@ -13,7 +12,7 @@
                             like that ever since. But since I was around 30 years old, I
                             developed a need for good research.
                         </p>
-                        <img src="img/books.jpg" alt="Picture of books"/>
+                        <img src="img/books.webp" alt="Picture of books"/>
         </article>
 
         <article class="bicolumn-right">
@@ -23,7 +22,7 @@
                             the more I realized the potential of research, if only I could
                             find it again later. I started tracking research on the computer.
                         </p>
-            <img src="img/stickies.jpg" alt="Picture of a white board covered
+            <img src="img/stickies.webp" alt="Picture of a white board covered
                         with stickies"/>
         </article>
 
@@ -41,7 +40,7 @@
                             "<a href="/publicstandard">first version</a> of this database
                             on-line.
             </p>
-                        <img src="img/booksandcomputer.jpg" alt="Picture of a computer and
+                        <img src="img/booksandcomputer.webp" alt="Picture of a computer and
                         a clutter of books"/>
         </article>
 

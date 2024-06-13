@@ -1,7 +1,4 @@
 @extends('public')
-
-    <a href="#top">Go to Top</a>
-
 @section('content')
     <main class="backgroundinfo">
         <h2>Old and New Testament Times</h2>
@@ -15,14 +12,14 @@
                 (when crushed) had enough oil left in them to burn for heat, and the
                 ashes after burning them could be used to make soap. This olive press
                 was used to drain the oil out of the pits, after they were first
-                crushed by this <a href="img/olive_crusher.jpg">large stone wheel.</a>
+                crushed by this <a href="img/olive_crusher.webp">large stone wheel.</a>
                 The olives were put into those black bags stacked under the long wooden
                 pole, and weights were added to the pole for additional pressure,
                 to obtain more oil after the first pressing. The quality of the oil
                 deteriorated with each additional pressing; the oil first obtained was
                 "virgin olive oil."
             </p>
-            <img src="img/olive_press.jpg" alt="Picture of an Olive Press"/>
+            <img src="img/olive_press.webp" alt="Picture of an Olive Press"/>
         </article>
 
         <article class="bicolumn-right">
@@ -33,7 +30,7 @@
                 like in Bible times. I <i>loved</i>
                 <a href="http://www.nazarethvillage.com/">Nazareth Village</a>!
             </p>
-            <img src="img/man_and_donkey.jpg" alt="Picture of a Man With a Donkey"/>
+            <img src="img/man_and_donkey.webp" alt="Picture of a Man With a Donkey"/>
         </article>
 
         <article class="bicolumn-right">
@@ -41,7 +38,7 @@
             <p>
                 This weaver's loom has a wool garment partially made on it.
             </p>
-            <img src="img/weavers_loom.jpg" alt="Picture of a Weaver's Loom"/>
+            <img src="img/weavers_loom.webp" alt="Picture of a Weaver's Loom"/>
         </article>
 
         <article class="bicolumn-right">
@@ -54,7 +51,7 @@
                 amount of water that flows from north to south can substantially
                 increase.
             </p>
-            <img src="img/jordan_river.jpg" alt="Picture of Jordan River"/>
+            <img src="img/jordan_river.webp" alt="Picture of Jordan River"/>
         </article>
 
         <article class="bicolumn-left">
@@ -65,7 +62,7 @@
                 well was the only exception. Women could go to the well by themselves
                 (John 4:7-26).
             </p>
-            <img src="img/well.jpg" alt="Picture of a Well"/>
+            <img src="img/well.webp" alt="Picture of a Well"/>
         </article>
 
         <article class="bicolumn-left">
@@ -83,7 +80,7 @@
                 Then this cycle repeats again, over and over, which eventually creates a
                 man-made hill.
             </p>
-            <img src="img/canaanite_civilization.jpg" alt="Picture of 2 holes in the ground like basements"/>
+            <img src="img/canaanite_civilization.webp" alt="Picture of 2 holes in the ground like basements"/>
         </article>
 
         <article class="bicolumn-right">
@@ -99,7 +96,7 @@
                 places to fall when there was war, that's where the soldiers lived and
                 practiced their warfare maneuvers.
             </p>
-            <img src="img/grain_silo.jpg" alt="Picture of a Grain Silo"/>
+            <img src="img/grain_silo.webp" alt="Picture of a Grain Silo"/>
         </article>
 
         <article class="bicolumn-right">
@@ -117,7 +114,7 @@
                 Whether or not this is literally the place, the "Valley of Armageddon" was
                 an appropriate name for this prophecy.
             </p>
-            <img src="img/valley_of_armageddon.jpg" alt="Picture of a Rich Field Lined with Trees"/>
+            <img src="img/valley_of_armageddon.webp" alt="Picture of a Rich Field Lined with Trees"/>
         </article>
 
         <article class="bicolumn-right">
@@ -135,7 +132,7 @@
                 the south. This type of nomadic tent was also home to Abraham,
                 Isaac and Jacob, who also lived as nomads.
             </p>
-            <img src="img/nomadic_tent.jpg" alt="Picture of a black goat-hair tent with nomad-type belongings"/>
+            <img src="img/nomadic_tent.webp" alt="Picture of a black goat-hair tent with nomad-type belongings"/>
         </article>
 
         <article class="bicolumn-left">
@@ -147,7 +144,7 @@
                 the terraces of the City of David. He also made large numbers of
                 weapons and shields" (2 Chronicles 32:5).
             </p>
-            <img src="img/hezekiahs_wall.jpg" alt="Picture of a stone wall that's 22 feet wide"/>
+            <img src="img/hezekiahs_wall.webp" alt="Picture of a stone wall that's 22 feet wide"/>
         </article>
 
         <article class="bicolumn-left">
@@ -158,7 +155,7 @@
                 a mineral and salt-rich mound which inherits the name "Sodom," because
                 of this tradition.
             </p>
-            <img src="img/mount_sodom.jpg" alt="Picture of an almost-white hill in front of the Dead Sea"/>
+            <img src="img/mount_sodom.webp" alt="Picture of an almost-white hill in front of the Dead Sea"/>
         </article>
 
         <article class="bicolumn-right">
@@ -170,7 +167,7 @@
                 me? It is hard for you to kick against the goads'" (Acts 26:14). Are you
                 kicking against the goads?
             </p>
-            <img src="img/goad_being_used.jpg" alt="Picture of a man holding a long stick meant to poke the animal"/>
+            <img src="img/goad_being_used.webp" alt="Picture of a man holding a long stick meant to poke the animal"/>
         </article>
 
         <article class="bicolumn-left">
@@ -186,7 +183,7 @@
                                 keep moving to find the scarce, hardy weeds that could feed their
                 flocks.
             </p>
-            <img src="img/sheep_fold.jpg" alt="Picture of a rock fence lined with barbs and a house behind it"/>
+            <img src="img/sheep_fold.webp" alt="Picture of a rock fence lined with barbs and a house behind it"/>
         </article>
 
         <article class="bicolumn-right">

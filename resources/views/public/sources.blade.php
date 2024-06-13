@@ -1,5 +1,4 @@
 @extends('public')
-
 @section('content')
 <main class="sources">
     <h1>Sources</h1>
@@ -7,7 +6,7 @@
     <table class="display table table-striped table-bordered table-responsive resourceTable" id="tblSource">
         <thead>
         <tr class="colHeaders">
-            {{--<th>ID</th>--}}
+            <th>ID</th>
             <th>Source</th>
         </tr>
         </thead>
@@ -31,7 +30,7 @@
                 },
                 widthFixed: false,
                 columns: [
-//                    { data: 'SourceId', name: 'SourceId' },
+                    { data: 'SourceId', name: 'SourceId' },
                     { data: 'SourceName', name: 'SourceName', sortable:false }
                 ]
             });

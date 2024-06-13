@@ -1,5 +1,4 @@
 @extends('public')
-
 @section('content')
     <main class="backgroundinfo">
         <h1>What are the Limits for this Database?</h1>

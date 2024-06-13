@@ -1,5 +1,4 @@
 @extends('public')
-
 @section('content')
     <main class="locations">
         <h2>Locations</h2>
@@ -16,7 +15,7 @@
         yearly rainfall! But let’s just explore altitude for a bit, since
                 yearly rainfall takes more explaining for Israel.
             </p>
-            <img src="img/hill_pigs_ran_down.jpg" alt="Picture of the hill the pigs ran down Luke 8 33"/>
+            <img src="img/hill_pigs_ran_down.webp" alt="Picture of the hill the pigs ran down Luke 8 33"/>
         </article>
 
         <article class="bicolumn-right">
@@ -31,7 +30,7 @@
         find water? And if there was a siege on your fortress, how could
         you protect your water source from the enemy?
             </p>
-            <img src="img/gamala.jpg" alt="Picture of the hill that Zealots rebelled against Romans on"/>
+            <img src="img/gamala.webp" alt="Picture of the hill that Zealots rebelled against Romans on"/>
         </article>
 
         <article class="centered-column">

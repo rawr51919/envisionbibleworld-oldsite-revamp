@@ -1,12 +1,11 @@
 @extends('public')
-
 @section('content')
     <main class="home">
         <h1>Why an Online Research Database?</h1>
 
         <main class="center">
             <h3>Why This Database Instead of Other Available Sources?</h3>
-            <img src="img/search.jpg" alt="Picture of Search box in browser"/>
+            <img src="img/search.webp" alt="Picture of Search box in browser"/>
             <p>
                 Do you feel like Googling information on Jesus? Clearly Jesus
                                 is the most controversial person that ever lived! Googling will

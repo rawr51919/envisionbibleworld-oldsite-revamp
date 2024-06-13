@@ -24,6 +24,8 @@ Route::get('welcome', [WelcomeController::class, 'index']);
 
 Route::get('welcome-legacy', [LegacyWelcomeController::class, 'index']);
 
+Route::get('login', [AuthController::class, 'login']);
+
 Route::get('admin', [HomeController::class, 'index']);
 
 Route::get('home', [HomeController::class, 'index']);
@@ -41,6 +43,7 @@ Route::resource('summary', SummaryController::class);
 //Public access routes
 Route::get('/', [PublicController::class, 'index']);
 Route::get('open', [PublicController::class, 'index']);
+Route::get('public', [PublicController::class, 'index']);
 Route::get('publicstandard', [PublicController::class, 'standard']);
 Route::get('categories', [PublicController::class, 'categories']);
 Route::get('eras', [PublicController::class, 'eras']);
@@ -49,13 +52,21 @@ Route::get('background', [PublicController::class, 'background']);
 Route::get('beliefs', [PublicController::class, 'beliefs']);
 Route::get('search', [PublicController::class, 'topical']);
 Route::get('explore', [PublicController::class, 'explore']);
-Route::get('contact', [PublicController::class, 'contact']);
+Route::get('contact-us', [PublicController::class, 'contact']);
 Route::get('locations', [PublicController::class, 'locations']);
 Route::get('sacrifices', [PublicController::class, 'sacrifices']);
 Route::get('lifestylesofjesustime', [PublicController::class, 'lifestyles']);
+Route::get('lifestyles-jesus-time', [PublicController::class, 'lifestyles']);
 Route::get('oldandnewtestamenttimes', [PublicController::class, 'oldandnew']);
+Route::get('old-new-testament-times', [PublicController::class, 'oldandnew']);
 Route::get('storiesaboutjesus', [PublicController::class, 'stories']);
+Route::get('stories-about-jesus', [PublicController::class, 'stories']);
 Route::get('aboutdatabase', [PublicController::class, 'aboutdatabase']);
+Route::get('about-database', [PublicController::class, 'aboutdatabase']);
+Route::get('what-drove-my-ambition', [PublicController::class, 'ambition']);
+Route::get('what-drives-my-passion', [PublicController::class, 'passion']);
+Route::get('doctrinal-statement', [PublicController::class, 'beliefs']);
+Route::get('what-are-the-limits-for-this-database', [PublicController::class, 'background']);
 
 Route::get('/open', [PublicController::class, 'index'])->name('open');
 Route::get('/open/subcategories', [PublicController::class, 'getPublicSubCategories'])->name('getpublicsubcategories');

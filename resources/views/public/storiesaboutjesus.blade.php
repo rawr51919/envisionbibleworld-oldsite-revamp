@@ -1,7 +1,4 @@
 @extends('public')
-
-    <a href="#top">Go to Top</a>
-
 @section('content')
     <main class="backgroundinfo">
         <h2>Stories About Jesus</h2>
@@ -15,7 +12,7 @@
                 this area was, from time immemorial, a refuge for those who wished to
                 isolate themselves from the world.
             </p>
-            <img src="img/mt_temptation.jpg" alt="Picture of the Mount of Temptation"/>
+            <img src="img/mt_temptation.webp" alt="Picture of the Mount of Temptation"/>
         </article>
 
         <article class="bicolumn-right">
@@ -30,7 +27,7 @@
                 better for him to have a great millstone fastened around his neck and
                 to be drowned in the depth of the sea" (Matthew 18:5-6).
             </p>
-            <img src="img/millstones.jpg" alt="Picture of a Couple of Large Millstones"/>
+            <img src="img/millstones.webp" alt="Picture of a Couple of Large Millstones"/>
         </article>
 
         <article class="bicolumn-left">
@@ -53,7 +50,7 @@
                 quite unpredictable, making Psalm 107:23-32 intensely real and personal
                 to the fishermen of Jesus' day.
             </p>
-            <img src="img/galilee_north.jpg" alt="Picture of Northern Galilee"/>
+            <img src="img/galilee_north.webp" alt="Picture of Northern Galilee"/>
         </article>
 
         <article class="bicolumn-right">
@@ -69,7 +66,7 @@
                 like a shrine, with pilgrims coming from afar to write their names on the
                 walls, etc.
             </p>
-            <img src="img/peters_house.jpg" alt="Picture of Peter's House"/>
+            <img src="img/peters_house.webp" alt="Picture of Peter's House"/>
         </article>
 
         <article class="bicolumn-right">
@@ -80,7 +77,7 @@
                 were all fenced in not only to keep in their chickens, sheep, etc., but to
                 help protect their women and children from outsiders.
             </p>
-            <img src="img/peters_west_courtyard.jpg" alt="Picture of Peter's West Courtyard"/>
+            <img src="img/peters_west_courtyard.webp" alt="Picture of Peter's West Courtyard"/>
         </article>
 
         <article class="bicolumn-left">
@@ -91,7 +88,7 @@
                 anointed the man's eyes with the mud and said to him, 'Go, wash in the pool
                 of Siloam' (which means Sent). So he went and washed and came back seeing."
             </p>
-            <img src="img/pool_of_siloam.jpg" alt="Picture of the Pool of Siloam"/>
+            <img src="img/pool_of_siloam.webp" alt="Picture of the Pool of Siloam"/>
         </article>
 
         <article class="bicolumn-right">
@@ -102,7 +99,7 @@
                 2002 and again in 2004. They served us tourists a Passover meal as part of
                 our learning experience; this was before we sat down to eat.
             </p>
-            <img src="img/passover_setting.jpg" alt="Picture of a Passover Meal"/>
+            <img src="img/passover_setting.webp" alt="Picture of a Passover Meal"/>
         </article>
 
         <article class="bicolumn-left">
@@ -121,7 +118,7 @@
                 to refer to turret-like structures. Only later did its basic meaning change
                 to the highest point.
             </p>
-            <img src="img/pinnacle_of_temple.jpg" alt="Picture of the Temple's Pinnacle"/>
+            <img src="img/pinnacle_of_temple.webp" alt="Picture of the Temple's Pinnacle"/>
         </article>
 
         <article class="bicolumn-right">
@@ -130,11 +127,11 @@
                 Jews walked up these steps when approaching the temple, especially during the
                 great pilgrimage festivals of Passover, Shavuot and Sukkot. Christian
                 archaeologists and scholars agree with 100% certainty that Jesus must've been
-                here (see also a <a href="img/southern_steps_modern.jpg">modern-day picture</a>
+                here (see also a <a href="img/southern_steps_modern.webp">modern-day picture</a>
                 of the restored southern steps). The temple itself was rebuilt in 1.5 years
                 (back in 19 BC), and most of the temple mount was completed by 26 AD.
             </p>
-            <img src="img/southern_steps.jpg" alt="Picture of Southern Steps"/>
+            <img src="img/southern_steps.webp" alt="Picture of Southern Steps"/>
         </article>
 
         <article class="bicolumn-left">
@@ -150,7 +147,7 @@
                 Herod's Palace. If this is true (which seems most likely), it changes the
                 validity of the "Via Dolorosa" as being where Jesus walked to his crucifixion.
             </p>
-            <img src="img/antonia_fortress.jpg" alt="Picture of the Antonia Fortress"/>
+            <img src="img/antonia_fortress.webp" alt="Picture of the Antonia Fortress"/>
         </article>
 
         <article class="bicolumn-right">
@@ -166,7 +163,7 @@
                 skull, which is why the place was called "Golgotha." And this first-century
                 replica of Jerusalem has such a hill on this site.
             </p>
-            <img src="img/golgotha_model.jpg" alt="Picture of where Jesus was crucified"/>
+            <img src="img/golgotha_model.webp" alt="Picture of where Jesus was crucified"/>
         </article>
 
         <article class="bicolumn-left">

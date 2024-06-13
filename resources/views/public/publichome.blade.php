@@ -1,8 +1,8 @@
 @extends('public')
-
 @section('content')
     <main class="home">
         <h1>Envision Bible World</h1>
+        <h2>This Fascination Is Contagious</h2>
 
             <h3>What I Have Is Extremely Contagious</h3>
             <p>
@@ -30,11 +30,11 @@
             </p>
 
                 <article class="bicolumn-left">
-            <img src="img/heather_video_taping.jpg" alt="Picture of me video taping in Israel"/>
+            <img src="img/heather_video_taping.webp" alt="Picture of me video taping in Israel" width="250" height="267"/>
         </article>
 
         <article class="bicolumn-right">
-            <img src="img/heather.jpg" alt="Picture of me"/>
+            <img src="img/heather.webp" alt="Picture of me" width="154" height="190"/>
         </article>
 
             <h4><em>See my first blog for:</h4>

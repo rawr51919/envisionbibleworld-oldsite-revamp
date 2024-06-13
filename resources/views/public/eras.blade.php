@@ -1,5 +1,4 @@
 @extends('public')
-
 @section('content')
 <main class="eras">
     <h1>Eras</h1>
@@ -7,7 +6,7 @@
     <table class="display table table-striped table-bordered table-responsive resourceTable" id="tblEra">
         <thead>
         <tr class="colHeaders">
-            {{--<th>ID</th>--}}
+            <th>ID</th>
             <th>Era</th>
         </tr>
         </thead>
@@ -31,7 +30,7 @@
                 },
                 widthFixed: false,
                 columns: [
-//                    { data: 'EraId', name: 'EraId' },
+                    { data: 'EraId', name: 'EraId' },
                     { data: 'Era', name: 'Era' },
                 ]
             });

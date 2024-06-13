@@ -1,5 +1,4 @@
 @extends('public')
-
 @section('content')
     <main class="home">
         <h1>What Drives My Passion?</h1>
@@ -38,7 +37,7 @@
                                 shameful when considering the ease of our technology today.
             </p>
 
-            <img src="img/data_and_empty_tomb.jpg" alt="Picture of the empty "/>
+            <img src="img/data_and_empty_tomb.webp" alt="Picture of the empty "/>
 
                         <p>
                 We live in an age of opportunity unparalleled with any other.
@@ -46,7 +45,7 @@
                                 be required, and from him to whom they entrusted much, they will
                                 demand the more” (Luke 12:48b). This drives my passion.
             </p>
-            <img src="img/scrolls.jpg" alt="Picture of an open scroll"/>
+            <img src="img/scrolls.webp" alt="Picture of an open scroll"/>
         </main>
     </main>
 @endsection

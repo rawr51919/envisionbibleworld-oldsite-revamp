@@ -1,5 +1,4 @@
 @extends('public')
-
 @section('content')
     <main>
 

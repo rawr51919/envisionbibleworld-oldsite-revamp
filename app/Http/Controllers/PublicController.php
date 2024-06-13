@@ -43,12 +43,22 @@ class PublicController extends Controller
      */
     public function index()
     {
-        return view('public');
+        return view('public.publichome');
     }
 
     public function aboutdatabase()
     {
         return view('public.aboutdatabase');
+    }
+
+    public function ambition()
+    {
+        return view('public.ambition');
+    }
+
+    public function passion()
+    {
+        return view('public.passion');
     }
 
     public function background()
@@ -58,7 +68,7 @@ class PublicController extends Controller
 
     public function beliefs()
     {
-        return view('public.doctrinalstatement');
+        return view('public.beliefs');
     }
 
     public function categories()
@@ -98,9 +108,9 @@ class PublicController extends Controller
         return view('public.sacrifices');
     }
 
-    public function lifestylesofjesustime()
+    public function lifestyles()
     {
-        return view('public.lifestyles-jesus-time');
+        return view('public.lifestylesofjesustime');
     }
 
     public function oldandnew()
@@ -118,6 +128,7 @@ class PublicController extends Controller
 
         //        This code is for postgreSql database
         //        $subQuery = Source::select(DB::raw('DISTINCT ON ("SourceName") "SourceName", "SourceId"'));
+        //        This code is for MySQL database
         $subQuery = Source::select(DB::raw('DISTINCT SourceName, SourceId'));
 
         $query = Source::select()->from(DB::raw(' ( ' . $subQuery->toSql() . ' ) AS sources '))

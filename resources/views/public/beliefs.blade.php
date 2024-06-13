@@ -1,7 +1,4 @@
 @extends('public')
-
-    <a href="#top">Go to Top</a>
-
 @section('content')
     <main class="beliefs">
         <h1>Beliefs</h1>

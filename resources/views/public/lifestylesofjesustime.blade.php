@@ -1,7 +1,4 @@
 @extends('public')
-
-    <a href="#top">Go to Top</a>
-
 @section('content')
     <main class="backgroundinfo">
         <h2>Lifestyles of Jesus’ time</h2>
@@ -19,7 +16,7 @@
         cobblestone road in Nazareth—is among the more certain places where
                 Jesus was.
             </p>
-            <img src="img/road_nazareth.jpg" alt="Picture of a cobblestone road in Nazareth"/>
+            <img src="img/road_nazareth.webp" alt="Picture of a cobblestone road in Nazareth"/>
         </article>
 
         <article class="bicolumn-right">
@@ -38,7 +35,7 @@
         come again and will take you to myself, that where I am you may be
         also.”
             </p>
-            <img src="img/insula.jpg" alt="Picture of an Insula"/>
+            <img src="img/insula.webp" alt="Picture of an Insula"/>
          </article>
 
         <article class="bicolumn-left">
@@ -51,7 +48,7 @@
         a map of these locations plus another location referred to in
         the next picture.
             </p>
-            <img src="img/nazareth_hills.jpg" alt="Picture of Nazareth hills in the distance"/>
+            <img src="img/nazareth_hills.webp" alt="Picture of Nazareth hills in the distance"/>
         </article>
 
         <article class="bicolumn-right">
@@ -63,7 +60,7 @@
         and travel mostly in the Jordan Valley, and of course they wouldn’t
         travel on the Sabbath. See also Caesarea Maritima’s Aqueduct (next).
             </p>
-            <img src="img/pilgrimage_to_jerusalem.jpg" alt="Picture of Israel with pilgrimage route"/>
+            <img src="img/pilgrimage_to_jerusalem.webp" alt="Picture of Israel with pilgrimage route"/>
         </article>
 
         <article class="bicolumn-left">
@@ -78,7 +75,7 @@
         help it. But the aqueduct in the below picture was 7 km long and
         used during Jesus’ time to carry water from the north east.
             </p>
-            <img src="img/caesarea_aqueduct.jpg" alt="Picture of Caesarea Maritima's aqueduct"/>
+            <img src="img/caesarea_aqueduct.webp" alt="Picture of Caesarea Maritima's aqueduct"/>
         </article>
 
         <article class="bicolumn-right">
@@ -91,7 +88,7 @@
         the foreground, and the south side of the temple mount in the
         background.
             </p>
-            <img src="img/jerusalem_in_jesus_time.jpg" alt="Picture of First-Century Jerusalem replica"/>
+            <img src="img/jerusalem_in_jesus_time.webp" alt="Picture of First-Century Jerusalem replica"/>
         </article>
 
         <article class="bicolumn-right">
@@ -110,7 +107,7 @@
         while giving their alms, but were about to be ritually cleansed
         anyway.
             </p>
-            <img src="img/mikvahs.jpg" alt="Picture of temple mount wall with four entrances into mikvahs"/>
+            <img src="img/mikvahs.webp" alt="Picture of temple mount wall with four entrances into mikvahs"/>
         </article>
 
         <article class="bicolumn-left">
@@ -119,7 +116,7 @@
                 Milestones indicated how far to the main destination, and this
         one was a Roman milestone from 83 CE on the Antioch Akko Road.
             </p>
-            <img src="img/roman_milestone.jpg" alt="Picture of tall stone with ancient Latin text"/>
+            <img src="img/roman_milestone.webp" alt="Picture of tall stone with ancient Latin text"/>
         </article>
 
         <article class="bicolumn-right">
@@ -129,7 +126,7 @@
         the hippodrome, showing how depraved the Romans were, since
                 they didn’t need any privacy to do their business.
             </p>
-            <img src="img/roman_toilets.jpg" alt="Picture of rock slabs spaced apart for people to straddle them"/>
+            <img src="img/roman_toilets.webp" alt="Picture of rock slabs spaced apart for people to straddle them"/>
         </article>
 
         <article class="bicolumn-left">
@@ -139,7 +136,7 @@
                 the Romans were: this is where they kept the animals that were to devour
                 the Christians being persecuted, or other prisoners.
             </p>
-            <img src="img/where_animals_were.jpg" alt="Picture of an underground enclosure"/>
+            <img src="img/where_animals_were.webp" alt="Picture of an underground enclosure"/>
         </article>
 
         <article class="bicolumn-right">
