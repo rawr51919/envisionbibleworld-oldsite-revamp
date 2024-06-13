@@ -7,7 +7,7 @@
     <title>Online Research | Heather Vincent</title>
 
     <!-- Fonts -->
-    <link href='https://fonts.googleapis.com/css?family=Roboto:400,300' rel='stylesheet' type='text/css'>
+    <link href='https://fonts.googleapis.com/css?family=Roboto:400,300&display=swap' rel='stylesheet' type='text/css'>
 
     {{-- <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
     <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
@@ -56,8 +56,7 @@
                 <span class="icon-bar"></span>
                 <span class="icon-bar"></span>
             </button>
-            <a class="navbar-brand navbar-logo" href="/public"><img src="/img/logo2_edited.png" alt="Envision Bible World" height="40"></a>
-            {{--<a class="navbar-brand" href="/public">Home</a>--}}
+            <a class="navbar-brand navbar-logo" href="/public"><img src="/img/logo2_edited.webp" alt="Envision Bible World"  width="210px" height="40px"></a>
         </div>
 
         <div class="collapse navbar-collapse">
