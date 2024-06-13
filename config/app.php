@@ -125,5 +125,10 @@ return [
 
     // 'providers' => [
     //     App\Providers\BusServiceProvider::class,
+    //     Ladumor\LaravelPwa\PWAServiceProvider::class,
     // ],
+
+    'aliases' => [
+        'LaravelPwa' => \Ladumor\LaravelPwa\LaravelPwa::class,
+    ],
 ];

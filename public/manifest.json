@@ -1,0 +1,17 @@
+{
+    "name": "Envision Bible World",
+    "short_name": "EBW",
+    "start_url": "/index.php",
+    "background_color": "#114310",
+    "description": "EnvisionBibleWorld as a PWA app",
+    "display": "fullscreen",
+    "theme_color": "#114310",
+    "icons": [
+        {
+            "src": "logo.png",
+            "sizes": "512x512",
+            "type": "image/png",
+            "purpose": "any maskable"
+        }
+    ]
+}
