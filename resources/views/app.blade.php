@@ -32,13 +32,16 @@
     });
     </script>
 
+    <!-- The jQuery library is a prerequisite for all jqSuite products -->
+    <script type="text/ecmascript" src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+
     {{--JQGRID--}}
     <link rel="stylesheet" type="text/css" media="screen" href="/css/jquery-ui.theme.min.css" />
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jqgrid/5.8.7/css/ui.jqgrid.min.css" integrity="sha512-32LPQp8XpFZLhafWO1i/8MvAFIVzDCqJ1C1blA1FjbW210TWwe6olae8lIkZHFwJU1oaR481MDX4clGpGKZigg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/free-jqgrid-fork@4.15.11/css/ui.jqgrid.min.css">
     <script src="https://cdn.jsdelivr.net/npm/free-jqgrid-fork@4.15.11/js/i18n/grid.locale-en.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/free-jqgrid-fork"></script>
     {{--<!-- The link to the CSS that the grid needs -->--}}
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jqgrid/5.8.7/css/ui.jqgrid-bootstrap.min.css" integrity="sha512-ftn86mcT2Gh41u83MCyhkPN0+SRgGwD/NO1DFadxw55k47dpltba8gD1YAJnPANIY5gZqxQ2IozW5W+nO5Plfg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/free-jqgrid-fork@4.15.11/css/ui.jqgrid-bootstrap.min.css">
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.min.js" integrity="sha384-BBtl+eGJRgqQAUMxJ7pMwbEyER4l1g+O15P+16Ep7Q9Q+zqX6gSbd85u4mG4QzX+" crossorigin="anonymous"></script>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.10.0/js/bootstrap-datepicker.min.js" integrity="sha512-LsnSViqQyaXpD4mBBdRYeP6sRwJiJveh2ZIbW41EBrNmKxgr/LFZIiWT6yr+nycvhvauz8c2nYMhrP80YhG7Cw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
@@ -48,19 +51,8 @@
     $.jgrid.defaults.responsive = true;
     $.jgrid.defaults.styleUI = 'Bootstrap';
     </script>
-    <!-- The jQuery library is a prerequisite for all jqSuite products -->
-    <script type="text/ecmascript" src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
-
-    <!--Links to Bootstrap and jqGrid CSS files-->
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css">
+    <!--Links to jqGrid CSS files-->
     <link rel='stylesheet' type='text/css' href='https://code.jquery.com/ui/1.13.3/themes/redmond/jquery-ui.min.css' />
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/free-jqgrid-fork@4.15.11/css/ui.jqgrid.min.css">
-
-
-    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
-    <script type='text/javascript' src='/js/jquery-ui-custom.min.js'></script>
-    <script src="https://cdn.jsdelivr.net/npm/free-jqgrid-fork@4.15.11/js/i18n/grid.locale-en.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/free-jqgrid-fork"></script>
 
 
     <link href="{{ asset('/css/app.css') }}" rel="stylesheet">
