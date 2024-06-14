@@ -147,7 +147,7 @@
             // Register a service worker hosted at the root of the
             // site using the default scope.
             if (document.referrer && new URL(document.referrer).origin !== window.location.origin) {
-                return;
+                console.log();
             } else {
                 navigator.serviceWorker.register("/sw.js").then(
                     (registration) => {
