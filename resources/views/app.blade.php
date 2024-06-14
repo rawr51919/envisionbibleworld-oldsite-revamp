@@ -77,7 +77,8 @@
     <nav class="navbar navbar-default">
         <div class="container-fluid">
             <div class="navbar-header">
-                <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+                <button type="button" class="navbar-toggle collapsed" data-toggle="collapse"
+                    data-target="#bs-example-navbar-collapse-1">
                     <span class="sr-only">Toggle Navigation</span>
                     <span class="icon-bar"></span>
                     <span class="icon-bar"></span>
@@ -90,7 +91,8 @@
                     <li><a href="standard">Standard Entries</a></li>
                     <li><a href="#">Narrow Topical Search</a></li>
                     <li class="dropdown">
-                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">List View <b class="caret"></b></a>
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">List View <b
+                                class="caret"></b></a>
                         <ul class="dropdown-menu">
                             <li><a href="category">Category</a></li>
                             <li><a href="subcategory">Subcategory</a></li>
@@ -113,7 +115,8 @@
                         <li><a href="{{ url('/auth/login') }}">Login</a></li>
                     @else
                         <li class="dropdown">
-                            <a href="#" class="dropdown-toggle" data-toggle="dropdown" aria-expanded="false">{{ Auth::user()->name }} <span class="caret"></span></a>
+                            <a href="#" class="dropdown-toggle" data-toggle="dropdown"
+                                aria-expanded="false">{{ Auth::user()->name }} <span class="caret"></span></a>
                             <ul class="dropdown-menu">
                                 <li><a href="{{ url('/auth/logout') }}">Logout</a></li>
                             </ul>
@@ -123,9 +126,11 @@
                 <div class="col-sm-3 col-md-3 pull-right">
                     <form class="navbar-form" role="search">
                         <div class="input-group">
-                            <input type="text" class="form-control" placeholder="Word Search" name="Search Term" id="srch-term">
+                            <input type="text" class="form-control" placeholder="Word Search" name="Search Term"
+                                id="srch-term">
                             <div class="input-group-btn">
-                                <button class="btn btn-default" type="submit" aria-label="Search"><i class="glyphicon glyphicon-search"></i></button>
+                                <button class="btn btn-default" type="submit" aria-label="Search"><i
+                                        class="glyphicon glyphicon-search"></i></button>
                             </div>
                         </div>
                     </form>
@@ -139,27 +144,20 @@
     <script src="{{ asset('/sw.js') }}"></script>
     <script>
         if ("serviceWorker" in navigator) {
-            // Register a service worker hosted at the root of the site using the default scope.
-            navigator.serviceWorker.register("/sw.js").then(
-                (registration) => {
-                    console.log("Service worker registration succeeded:", registration);
-                    // Check if the page is controlled by a service worker
-                    if (navigator.serviceWorker.controller) {
-                        console.log("This page is controlled by a service worker.");
-                        // Detect if there was a redirect
-                        if (document.referrer && new URL(document.referrer).origin !== window.location.origin) {
-                            console.log("Page loaded after a redirect.");
-                            // Perform any specific actions needed after a redirect
-                            // For example, display a message or reload the page
-                        }
-                    } else {
-                        console.log("This page is not controlled by a service worker.");
-                    }
-                },
-                (error) => {
-                    console.error(`Service worker registration failed: ${error}`);
-                },
-            );
+            // Register a service worker hosted at the root of the
+            // site using the default scope.
+            if (document.referrer && new URL(document.referrer).origin !== window.location.origin) {
+                return;
+            } else {
+                navigator.serviceWorker.register("/sw.js").then(
+                    (registration) => {
+                        console.log("Service worker registration succeeded:", registration);
+                    },
+                    (error) => {
+                        console.error(`Service worker registration failed: ${error}`);
+                    },
+                );
+            }
         } else {
             console.error("Service workers are not supported.");
         }
