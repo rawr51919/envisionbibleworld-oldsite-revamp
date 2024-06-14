@@ -51,22 +51,22 @@
             </p>
 
             <p>
-                See my <a href="/lifestylesofjesustime">pictures from Israel</a>,
+                See my <a href="lifestylesofjesustime">pictures from Israel</a>,
                                 the first of my
                                 <a href="https://youtu.be/e6lBQ7GPqnQ">documentary segments</a>,
-                                my <a href="/standard">research database</a>, and the
-                                <a href="/deals">products and services</a> I’ll start recommending.
+                                my <a href="standard">research database</a>, and the
+                                <a href="deals">products and services</a> I’ll start recommending.
                                 These all complement envisioning the Bible world. I’m convinced
                                 this fascination is contagious, but my prayer is confidence in
                                 God will become contagious, too.
             </p>
 
             <p>
-                                <a href="/contact">Add yourself</a> to my email list for receiving
+                                <a href="contact">Add yourself</a> to my email list for receiving
                                 both my weekly blogs and links to my documentary segments being
                                 published each week, until all the segments are published. Learn
-                                more about my <a href="/ambition">ambition</a> (why I made a
-                                research database) and <a href="/passion">passion</a> (why my
+                                more about my <a href="ambition">ambition</a> (why I made a
+                                research database) and <a href="passion">passion</a> (why my
                                 motivation never dies). Send me a comment or question.
             </p>
 
@@ -77,7 +77,7 @@
                                 parents. Like the news, occasional details can be too graphic.
                                 Children younger than 12 should be excluded, or at least guided
                                 through my blogs. Some products I recommend, and perhaps even a
-                                <a href="/lifestylesofjesustime">picture from Israel (at the bottom)</a>,
+                                <a href="lifestylesofjesustime">picture from Israel (at the bottom)</a>,
                                 may also be objectionable.
             </p>
         </article>

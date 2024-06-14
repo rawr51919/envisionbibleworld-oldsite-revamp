@@ -83,28 +83,28 @@
                     <span class="icon-bar"></span>
                     <span class="icon-bar"></span>
                 </button>
-                <a class="navbar-brand" href="/">Home</a>
+                <a class="navbar-brand" href="public">Home</a>
             </div>
             <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
                 <ul class="nav navbar-nav">
-                    <li><a href="/standard">Standard Entries</a></li>
+                    <li><a href="standard">Standard Entries</a></li>
                     <li><a href="#">Narrow Topical Search</a></li>
                     <li class="dropdown">
                         <a href="#" class="dropdown-toggle" data-toggle="dropdown">List View <b class="caret"></b></a>
                         <ul class="dropdown-menu">
-                            <li><a href="/category">Category</a></li>
-                            <li><a href="/subcategory">Subcategory</a></li>
+                            <li><a href="category">Category</a></li>
+                            <li><a href="subcategory">Subcategory</a></li>
                             <li class="divider"></li>
-                            <li><a href="/era">Era</a></li>
-                            <li><a href="/erayear">Era Year</a></li>
+                            <li><a href="era">Era</a></li>
+                            <li><a href="erayear">Era Year</a></li>
                             <li class="divider"></li>
-                            <li><a href="/sourcetype">Source Type</a></li>
-                            <li><a href="/source">Source</a></li>
-                            <li><a href="/sourcequoted">Source Quoted</a></li>
+                            <li><a href="sourcetype">Source Type</a></li>
+                            <li><a href="source">Source</a></li>
+                            <li><a href="sourcequoted">Source Quoted</a></li>
                             <li class="divider"></li>
-                            <li><a href="/summary">Summary</a></li>
+                            <li><a href="summary">Summary</a></li>
                             <li class="divider"></li>
-                            <li><a href="/quotation">Quotation</a></li>
+                            <li><a href="quotation">Quotation</a></li>
                         </ul>
                     </li>
                 </ul>

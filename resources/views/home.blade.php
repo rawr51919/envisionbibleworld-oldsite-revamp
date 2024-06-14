@@ -72,7 +72,7 @@
     <script>
         $(document).ready(function() {
             $('#btnCancel').click(function() {
-               location.href="/standard";
+               location.href="standard";
             });
         });
     </script>

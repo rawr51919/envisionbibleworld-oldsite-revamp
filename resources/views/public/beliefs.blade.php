@@ -261,7 +261,7 @@
                 <li>
                     <p>
                         See also more about this database at:
-                        <a href="/aboutdatabase">About Database</a>
+                        <a href="aboutdatabase">About Database</a>
                         or other links <a href="#top">at the top</a> of this page
                     </p>
                 </li>

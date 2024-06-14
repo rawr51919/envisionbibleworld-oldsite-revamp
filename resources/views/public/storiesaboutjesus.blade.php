@@ -169,8 +169,8 @@
         <article class="bicolumn-left">
             <p>
                 See also more pictures at:
-                <a href="/lifestylesofjesustime">Lifestyles of Jesus' Time</a>
-                or <a href="/oldandnewtestamenttimes">Old and New Testament Times</a>
+                <a href="lifestylesofjesustime">Lifestyles of Jesus' Time</a>
+                or <a href="oldandnewtestamenttimes">Old and New Testament Times</a>
             </p>
             <p>
                 <a href="#top">Back to top of page</a>

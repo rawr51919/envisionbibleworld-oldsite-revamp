@@ -35,15 +35,15 @@
                                 college’s program). My 2017 students had to do more behind-the-scenes
                                 work. I continue to research, and in May 2018, Lord willing, more
                                 data will be uploaded. Depending on how fast my students progress,
-                                they may even start the <a href="/locations">mapping functions</a>,
-                                in May 2018. See also plans for the <a href="/sacrifices">sacrifices</a>.
+                                they may even start the <a href="locations">mapping functions</a>,
+                                in May 2018. See also plans for the <a href="sacrifices">sacrifices</a>.
             </p>
             <h3>Aren’t Interpretations of the Bible Controversial?</h3>
             <p>
                 Sometimes, but all my entries try to rigidly adhere to literal
                                 summaries of Bible texts to give a relatively objective birds’
                                 eye-view of the Bible’s contents. See also my
-                                <a href="/beliefs">doctrinal statement</a>.
+                                <a href="beliefs">doctrinal statement</a>.
             </p>
         </article>
 
@@ -55,7 +55,7 @@
                                 Testament, Jesus’ era and ministry, in an intimately familiar
                                 fashion. Perhaps eventually others will partner with me. If so,
                                 I may eventually be able to get others inputting into my database,
-                                too. I just started this <a href="/blog">blog</a>
+                                too. I just started this <a href="blog">blog</a>
                                 and promoting my affiliate marketing business in October 2017. I
                                 have no idea yet what the Lord may do with/for my database.
             </p>

@@ -142,8 +142,8 @@
         <article class="bicolumn-right">
             <p>
                 See also more pictures at:
-                <a href="/oldandnewtestamenttimes">Old and New Testament Times</a>
-                or <a href="/storiesaboutjesus">Stories About Jesus</a>
+                <a href="oldandnewtestamenttimes">Old and New Testament Times</a>
+                or <a href="storiesaboutjesus">Stories About Jesus</a>
             </p>
             <p>
                 <a href="#top">Back to top of page</a>

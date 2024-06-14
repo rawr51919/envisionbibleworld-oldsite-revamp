@@ -37,7 +37,7 @@
                             This wasn't easy for me to create since usually such projects take
                             a team of specialties to develop. That costs big bucks! Since 2016,
                             however, I've been happy to have my
-                            "<a href="/publicstandard">first version</a> of this database
+                            "<a href="publicstandard">first version</a> of this database
                             on-line.
             </p>
                         <img src="img/booksandcomputer.webp" alt="Picture of a computer and
@@ -45,8 +45,8 @@
         </article>
 
         <article class="centered-column">
-See more under “<a href="/locations">Locations</a>,” with a planned release for
-2018, and “<a href="/sacrifices">Sacrifices</a>,” to be released in 2019.
+See more under “<a href="locations">Locations</a>,” with a planned release for
+2018, and “<a href="sacrifices">Sacrifices</a>,” to be released in 2019.
             </p>
                                 .
         </article>

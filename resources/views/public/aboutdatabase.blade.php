@@ -12,7 +12,7 @@
                                 bring up all the “riff raff” along with what you consider to be
                                 “the good stuff.” Certainly, I’ll have a belief about Jesus that
                                 may or may not sit well with you. You’ll have to
-                                <a href="/beliefs">keep reading</a> to find out.
+                                <a href="beliefs">keep reading</a> to find out.
             </p>
 
             <h3>How Can I Reach My Own Conclusions Confidently?</h3>
@@ -36,10 +36,10 @@
                                 context we can also apply lessons more wisely. I went to Israel
                                 twice for this reason, and learned so much it seemed critical to
                                 give as many insights to as many as possible. My
-                                <a href="/blog">blog</a> and
+                                <a href="blog">blog</a> and
                                 <a href="https://youtu.be/IpdBJZXOWL8">documentary segments</a>
                                 are easier and faster ways to address this need. My
-                                <a href="/limits">database</a> is a work in progress, but has
+                                <a href="limits">database</a> is a work in progress, but has
                                 potential to address these concerns better, at least eventually.
                                 Before I start writing Biblical fiction, though, <em>I’ll need
                                 people to be able to check my sources if they want to.</em> So

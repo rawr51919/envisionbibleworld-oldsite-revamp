@@ -78,7 +78,7 @@
                     <span class="icon-bar"></span>
                     <span class="icon-bar"></span>
                 </button>
-                <span class="navbar-logo"><a class="navbar-brand" href="/public"><img src="/img/logo2_edited.webp"
+                <span class="navbar-logo"><a class="navbar-brand" href="public"><img src="img/logo2_edited.webp"
                             alt="Envision Bible World" width="210px" height="40px"></a></span>
             </div>
             <div class="collapse navbar-collapse">
@@ -87,75 +87,75 @@
                         <a href="#" class="dropdown-toggle" data-toggle="dropdown">Envision Bible World <b
                                 class="caret"></b></a>
                         <ul class="dropdown-menu">
-                            <li><a href="/">Envision Bible World</a></li>
+                            <li><a href="public">Envision Bible World</a></li>
                             <li class="divider"></li>
-                            <li><a href="/lifestyles-jesus-time">Pictures: Life Styles of Jesus' Time</a></li>
+                            <li><a href="lifestyles-jesus-time">Pictures: Life Styles of Jesus' Time</a></li>
                             <li class="divider"></li>
-                            <li><a href="/old-new-testament-times">Pictures: Old and New Testament Times</a></li>
+                            <li><a href="old-new-testament-times">Pictures: Old and New Testament Times</a></li>
                             <li class="divider"></li>
-                            <li><a href="/stories-about-jesus">Pictures: Stories About Jesus</a></li>
+                            <li><a href="stories-about-jesus">Pictures: Stories About Jesus</a></li>
                         </ul>
                     </li>
                     <li class="dropdown">
                         <a href="#" class="dropdown-toggle" data-toggle="dropdown">About Me <b
                                 class="caret"></b></a>
                         <ul class="dropdown-menu">
-                            <li><a href="/about-me">About Me</a></li>
+                            <li><a href="about-me">About Me</a></li>
                             <li class="divider"></li>
-                            <li><a href="/what-drove-my-ambition">What Drove My Ambition?</a></li>
+                            <li><a href="what-drove-my-ambition">What Drove My Ambition?</a></li>
                             <li class="divider"></li>
-                            <li><a href="/what-drives-my-passion">What Drives My Passion?</a></li>
+                            <li><a href="what-drives-my-passion">What Drives My Passion?</a></li>
                             <li class="divider"></li>
-                            <li><a href="/doctrinal-statement">Doctrinal Statement</a></li>
+                            <li><a href="doctrinal-statement">Doctrinal Statement</a></li>
                         </ul>
                     </li>
                     <li class="dropdown">
-                        <a href="/aboutdatabase" class="dropdown-toggle" data-toggle="dropdown">About Database <b
+                        <a href="aboutdatabase" class="dropdown-toggle" data-toggle="dropdown">About Database <b
                                 class="caret"></b></a>
                         <ul class="dropdown-menu">
-                            <li><a href="/about-database">About Database</a></li>
+                            <li><a href="about-database">About Database</a></li>
                             <li class="divider"></li>
-                            <li><a href="/what-are-the-limits-for-this-database">What Are The Limits For This
+                            <li><a href="what-are-the-limits-for-this-database">What Are The Limits For This
                                     Database?</a></li>
                             <li class="divider"></li>
-                            <li><a href="/locations">Locations</a></li>
+                            <li><a href="locations">Locations</a></li>
                             <li class="divider"></li>
-                            <li><a href="/sacrifices">Sacrifices</a></li>
+                            <li><a href="sacrifices">Sacrifices</a></li>
                             <li class="divider"></li>
-                            <li><a href="/publicstandard">Standard Entries</a></li>
+                            <li><a href="publicstandard">Standard Entries</a></li>
                             <li class="divider"></li>
-                            <li><a href="/categories">Category List</a></li>
+                            <li><a href="categories">Category List</a></li>
                             <li class="divider"></li>
-                            <li><a href="/eras">Era List</a></li>
+                            <li><a href="eras">Era List</a></li>
                             <li class="divider"></li>
-                            <li><a href="/sources">Source List</a></li>
+                            <li><a href="sources">Source List</a></li>
                         </ul>
                     </li>
                     <li class="dropdown">
                         <a href="#" class="dropdown-toggle" data-toggle="dropdown">Blog <b
                                 class="caret"></b></a>
                         <ul class="dropdown-menu">
-                            <li><a href="/blog">Blog</a></li>
+                            <li><a href="blog">Blog</a></li>
                             <li class="divider"></li>
-                            <li><a href="/contact-us">Contact Us</a></li>
+                            <li><a href="contact-us">Contact Us</a></li>
                         </ul>
                     </li>
                     <li class="dropdown">
                         <a href="#" class="dropdown-toggle" data-toggle="dropdown">Deals <b
                                 class="caret"></b></a>
                         <ul class="dropdown-menu">
-                            <li><a href="/deals">Deals</a></li>
+                            <li><a href="deals">Deals</a></li>
                             <li class="divider"></li>
-                            <li><a href="/products">Books - Information With Lots of Pictures</a></li>
+                            <li><a href="products">Books - Information With Lots of Pictures</a></li>
                             <li class="divider"></li>
-                            <li><a href="/books-biblical-fiction">Books - Biblical Fiction</a></li>
+                            <li><a href="books-biblical-fiction">Books - Biblical Fiction</a></li>
                             <li class="divider"></li>
-                            <li><a href="/books-like-study-learn-lots">Books - For Those Who Like to Study and Learn
+                            <li><a href="books-like-study-learn-lots">Books - For Those Who Like to Study and Learn
                                     Lots</a></li>
                             <li class="divider"></li>
-                            <li><a href="/documentaries">Documentaries</a></li>
+                            <li><a href="documentaries">Documentaries</a></li>
                             <li class="divider"></li>
-                            <li><a href="/services">Services</a></li>
+                            <li><a href="services">Services</a></li>
                             <li class="divider"></li>
                         </ul>
                     </li>
