@@ -138,20 +138,31 @@
     </div>
     <script src="{{ asset('/sw.js') }}"></script>
     <script>
-       if ("serviceWorker" in navigator) {
-          // Register a service worker hosted at the root of the
-          // site using the default scope.
-          navigator.serviceWorker.register("/sw.js").then(
-          (registration) => {
-             console.log("Service worker registration succeeded:", registration);
-          },
-          (error) => {
-             console.error(`Service worker registration failed: ${error}`);
-          },
-        );
-      } else {
-         console.error("Service workers are not supported.");
-      }
+        if ("serviceWorker" in navigator) {
+            // Register a service worker hosted at the root of the site using the default scope.
+            navigator.serviceWorker.register("/sw.js").then(
+                (registration) => {
+                    console.log("Service worker registration succeeded:", registration);
+                    // Check if the page is controlled by a service worker
+                    if (navigator.serviceWorker.controller) {
+                        console.log("This page is controlled by a service worker.");
+                        // Detect if there was a redirect
+                        if (document.referrer && new URL(document.referrer).origin !== window.location.origin) {
+                            console.log("Page loaded after a redirect.");
+                            // Perform any specific actions needed after a redirect
+                            // For example, display a message or reload the page
+                        }
+                    } else {
+                        console.log("This page is not controlled by a service worker.");
+                    }
+                },
+                (error) => {
+                    console.error(`Service worker registration failed: ${error}`);
+                },
+            );
+        } else {
+            console.error("Service workers are not supported.");
+        }
     </script>
 </body>
 </html>
