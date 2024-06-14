@@ -67,6 +67,7 @@ Route::get('what-drove-my-ambition', [PublicController::class, 'ambition']);
 Route::get('what-drives-my-passion', [PublicController::class, 'passion']);
 Route::get('doctrinal-statement', [PublicController::class, 'beliefs']);
 Route::get('what-are-the-limits-for-this-database', [PublicController::class, 'background']);
+Route::get('about-me', [PublicController::class, 'topical']);
 
 Route::get('/open', [PublicController::class, 'index'])->name('open');
 Route::get('/open/subcategories', [PublicController::class, 'getPublicSubCategories'])->name('getpublicsubcategories');

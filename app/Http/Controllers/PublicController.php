@@ -71,6 +71,11 @@ class PublicController extends Controller
         return view('public.beliefs');
     }
 
+    public function topical()
+    {
+        return view('public.topical');
+    }
+
     public function categories()
     {
         $items = Category::select('Category', 'CategoryId')->orderBy('Category')->get()->lists('Category', 'CategoryId');
