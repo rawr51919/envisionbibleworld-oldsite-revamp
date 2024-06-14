@@ -141,7 +141,7 @@
     <div class="container">
         @yield('content')
     </div>
-    <script src="{{ asset('/sw.js') }}"></script>
+    <script src="{{ asset('sw.js') }}"></script>
     <script>
         if ("serviceWorker" in navigator) {
             // Register a service worker hosted at the root of the
@@ -149,7 +149,7 @@
             if (document.referrer && new URL(document.referrer).origin !== window.location.origin) {
                 console.log();
             } else {
-                navigator.serviceWorker.register("/sw.js").then(
+                navigator.serviceWorker.register("sw.js").then(
                     (registration) => {
                         console.log("Service worker registration succeeded:", registration);
                     },

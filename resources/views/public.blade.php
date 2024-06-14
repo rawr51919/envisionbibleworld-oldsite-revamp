@@ -181,7 +181,7 @@
     <!-- DataTables -->
     <script src="https://cdn.datatables.net/2.0.8/js/dataTables.min.js"></script>
     <!-- PWA service worker -->
-    <script src="{{ asset('/sw.js') }}"></script>
+    <script src="{{ asset('sw.js') }}"></script>
     <script>
         if ("serviceWorker" in navigator) {
             // Register a service worker hosted at the root of the
@@ -189,7 +189,7 @@
             if (document.referrer && new URL(document.referrer).origin !== window.location.origin) {
                 console.log();
             } else {
-                navigator.serviceWorker.register("/sw.js").then(
+                navigator.serviceWorker.register("sw.js").then(
                     (registration) => {
                         console.log("Service worker registration succeeded:", registration);
                     },
