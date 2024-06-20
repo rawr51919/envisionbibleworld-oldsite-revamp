@@ -8,7 +8,7 @@
         "php": "^8.3",
         "aws/aws-sdk-php": "^3.314.0",
         "ladumor/laravel-pwa": "^0.0.4",
-        "laravel/framework": "v11.11.0",
+        "laravel/framework": "v11.11.1",
         "laravel/tinker": "v2.9.0",
         "yajra/laravel-datatables-oracle": "v11.1.1"
     },
